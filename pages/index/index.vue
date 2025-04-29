@@ -7,7 +7,8 @@
 				</view>
 			</template>
 		</up-navbar>
-		<up-tabs :list="list" @click="tabclick" itemStyle="padding:0 70rpx; height: 34rpx; margin:10rpx 0 30rpx 0;"
+		<up-tabs :scrollable="false" :list="list" @click="tabclick"
+			itemStyle="height: 34rpx; margin:10rpx 0 30rpx 0;"
 			inactiveStyle="font-size: 28rpx;color: #B7C4D7;" activeStyle="color: #092D5C;font-size:30rpx"></up-tabs>
 		<view class="u-flex filter u-col-center u-row-around">
 			<!-- 时间 -->
@@ -364,6 +365,7 @@
 			color: #FFFFFF;
 			line-height: 80rpx;
 			text-align: center;
+			flex-shrink: 0;
 		}
 
 		.itemType {

@@ -1,8 +1,8 @@
+<!-- 完成情况 -->
 <template>
 	<view>
-		<up-navbar title="任务&通知" :placeholder="true" :autoBack="true" />
-		<up-tabs :scrollable="false" :list="list" @click="tabclick" itemStyle="padding:0 50rpx; height: 34rpx; margin:30rpx 0;"
-			inactiveStyle="font-size: 28rpx;color: #B7C4D7;" activeStyle="color: #092D5C;font-size:30rpx"></up-tabs>
+		<up-navbar title="完成情况" :placeholder="true" :autoBack="true" />
+
 		<view class="up-p-t-20" style="background:#ffffff;">
 			<up-search class="up-m-b-20" placeholder="请输入查找内容" v-model="keyword" :showAction="false" bgColor="#F6F8FC"
 				height="40"></up-search>
@@ -63,24 +63,32 @@
 		</view>
 		<view class="taskbox">
 			<view class="taskItem">
-				<view class="titemTop u-flex u-row-between up-p-b-15">
-					<view class="ttleft u-flex u-col-center">
-						<image src="/static/work/time.png"></image>
-						<view>2023.03.05 16:00</view>
-					</view>
-					<view class="ttright">待确认</view>
+				<view class="u-flex u-row-between">
+					<view class="itleft">人员名称</view>
+					<view class="itleft2">退回</view>
+	<!-- 				<view class="itleft2" style="background-color:#1CAA42;">已完成</view>
+					<view class="itleft2" style="background-color:#FEAC49;">待确认</view> -->
+					<view class="itright up-m-l-80">2023.03.05 12:00</view>
+					<view class="itright2">查看</view>
 				</view>
-				<view class="task-title up-m-t-20 bold">
-					待处理事项的的名称
+			</view>
+			<view class="taskItem">
+				<view class="u-flex u-row-between">
+					<view class="itleft">人员名称</view>
+					<view class="itleft2">退回</view>
+					<view class="itright up-m-l-80">2023.03.05 12:00</view>
+					<view class="itright2">查看</view>
 				</view>
-				<view class="tasktext">类型：任务</view>
-				<view class="tasktext">下发人：姓名</view>
-				<view class="tasktext">截止时间：2023.04.08</view>
-				<view class="tasktext">状态：进行中</view>
-				<view class="tasktext">当前进度：20/200</view>
+			</view>
+			<view class="taskItem">
+				<view class="u-flex u-row-between">
+					<view class="itleft">人员名称</view>
+					<view class="itleft2">退回</view>
+					<view class="itright up-m-l-80">2023.03.05 12:00</view>
+					<view class="itright2">查看</view>
+				</view>
 			</view>
 		</view>
-		<image src="/static/work/jia.png" class="tianj" @click="addnavTap('/pages/work/task/addtask')"></image>
 
 
 		<!-- 选择时间 -->
@@ -99,19 +107,6 @@
 		reactive,
 		onMounted
 	} from 'vue';
-	const list = reactive([{
-			name: '待处理'
-		},
-		{
-			name: '已处理'
-		},
-		{
-			name: '我发起的'
-		},
-		{
-			name: '抄送'
-		},
-	]);
 	const typeList = reactive([{
 		label: '任务',
 		value: 1
@@ -164,11 +159,7 @@
 			url: url
 		})
 	}
-	// tab切换
-	const tabclick = (e)=>{
-		console.log(e)
-	}
-	
+
 	// 关闭筛选框
 	const closeDropdown = () => {
 		// this.$refs.uDropdownRef.close();
@@ -241,44 +232,35 @@
 		border-radius: 10rpx;
 		padding: 30rpx;
 
-		.titemTop {
-			border-bottom: 1rpx solid #F5F5F5;
-
-			.ttleft {
-				font-size: 26rpx;
-				color: #B7C4D7;
-
-				image {
-					width: 30rpx;
-					height: 30rpx;
-					margin-right: 10rpx;
-				}
-			}
-
-			.ttright {
-				font-size: 26rpx;
-				color: #3C82FE;
-			}
-		}
-
-		.task-title {
-			font-size: 36rpx;
+		.itleft {
+			font-size: 28rpx;
 			color: #092D5C;
 		}
 
-		.tasktext {
+		.itleft2 {
+			background: #FE4949;
+			border-radius: 26rpx;
+			padding: 2rpx 17rpx;
+			font-size: 20rpx;
+			color: #FFFFFF;
+			line-height: 2;
+		}
+
+		.itright {
 			font-size: 26rpx;
-			color: #5A78A0;
-			line-height: 50rpx;
+			color: #B7C4D7;
+		}
+
+		.itright2 {
+			background: #F6F8FC;
+			border-radius: 26rpx;
+			padding: 2rpx 17rpx;
+			font-size: 20rpx;
+			color: #092D5C;
+			line-height: 2;
 		}
 	}
-	.tianj{
-		width:120rpx;
-		height:120rpx;
-		position: absolute;
-		right:10rpx;
-		bottom:15vh;
-	}
+
 	.slot-content {
 		background: #fff;
 

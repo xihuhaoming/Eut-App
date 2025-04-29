@@ -1,46 +1,29 @@
+<!-- 提交记录 -->
 <template>
 	<view>
-		<up-navbar title="事项详情" :placeholder="true" :autoBack="true" />
+		<up-navbar title="提交记录" :placeholder="true" :autoBack="true" />
 		<view class="const">
-			<view class="detileItem">
-				<view class="itemTime up-flex u-col-center">
-					<view class="timeLeft up-m-r-10">通知</view>
-					<view class="timeright">2023.03.05截止</view>
-				</view>
-				<view class="up-flex u-col-center up-m-t-15">
-					<image src="/static/logo.png" class="infoLeft up-m-r-10">通知</image>
-					<view class="inforight">下发人名字：2023.03.05 16:00 下发</view>
-				</view>
-				<view class="rwname bold up-m-t-20 up-m-b-20">任务事项名称</view>
-				<view class="rwcon">
-					如怀疑存在 DNS 劫持，可尝试更换 DNS 服务器或使用其他域名解析服务进行测试，以确定是否是 DNS 方面的问题
-				</view>
-				<view class="rightIcon" style="background: #FEAC49;">待处理</view>
-			</view>
 			<view class="xtitle bold">提交记录</view>
 			<view class="detileItem">
 				<view class="itemTime up-flex u-col-center">
-					<view class="timeLeft up-m-r-10">通知</view>
-					<view class="timeright">2023.03.05截止</view>
-				</view>
-				<view class="up-flex u-col-center up-m-t-15">
-					<image src="/static/logo.png" class="infoLeft up-m-r-10">通知</image>
-					<view class="inforight">下发人名字：2023.03.05 16:00 下发</view>
+					<view class="timeLeft up-m-r-10">提交</view>
+					<view class="timeright">2023.03.05 20:00 提交</view>
 				</view>
 				<view class="rwname bold up-m-t-20 up-m-b-20">任务事项名称</view>
 				<view class="rwcon">
 					如怀疑存在 DNS 劫持，可尝试更换 DNS 服务器或使用其他域名解析服务进行测试，以确定是否是 DNS 方面的问题
 				</view>
+				<!-- <view class="rightIcon" style="background: #FEAC49;">待处理</view> -->
+				<!-- <view class="rightIcon" style="background: #FE4949;">驳回</view> -->
+				<!-- <view class="rightIcon" style="background: #3C82FE;">待确认</view> -->
+				<view class="rightIcon" style="background: #1CAA42;">已通过</view>
+
 				<view class="updateImg up-flex u-flex-wrap">
 					<image src="/static/logo.png" class="up-m-l-20 up-m-t-20"></image>
 					<image src="/static/logo.png" class="up-m-l-20 up-m-t-20"></image>
 					<image src="/static/logo.png" class="up-m-l-20 up-m-t-20"></image>
 					<image src="/static/logo.png" class="up-m-l-20 up-m-t-20"></image>
 				</view>
-				<!-- <view class="rightIcon" style="background: #FEAC49;">待处理</view> -->
-				<!-- <view class="rightIcon" style="background: #FE4949;">驳回</view> -->
-				<!-- <view class="rightIcon" style="background: #3C82FE;">待确认</view> -->
-				<view class="rightIcon" style="background: #1CAA42;">已通过</view>
 			</view>
 		</view>
 	</view>

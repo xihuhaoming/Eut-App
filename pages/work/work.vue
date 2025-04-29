@@ -38,19 +38,19 @@
 				url: ""
 			}, {
 				img: "/static/work/icon3.png",
-				name: "开票申请",
+				name: "日常报销",
 				url: ""
 			}, {
 				img: "/static/work/icon4.png",
-				name: "开票申请",
+				name: "履约金",
 				url: ""
 			}, {
 				img: "/static/work/icon5.png",
-				name: "开票申请",
+				name: "收款申请",
 				url: ""
 			}, {
 				img: "/static/work/icon6.png",
-				name: "开票申请",
+				name: "成本支出",
 				url: ""
 			}, ]
 		}, {

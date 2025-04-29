@@ -48,16 +48,6 @@
 			padding: 20rpx 0 !important;
 		}
 
-		.qued {
-			width: 638rpx;
-			height: 98rpx;
-			background: #3C82FE;
-			box-shadow: 0rpx 8rpx 21rpx 0rpx rgba(60, 130, 254, 0.3);
-			border-radius: 59rpx;
-			text-align:center;
-			line-height: 98rpx;
-			color:#fff;
-			font-size: 36rpx;
-		}
+		
 	}
 </style>

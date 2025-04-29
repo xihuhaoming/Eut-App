@@ -1,5 +1,6 @@
 <template>
 	<view>
+		<!-- 提交 -->
 		<up-navbar title="事项详情" :placeholder="true" :autoBack="true" />
 		<view class="const">
 			<view class="detileItem">
