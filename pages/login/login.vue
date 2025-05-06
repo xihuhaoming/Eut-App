@@ -31,14 +31,26 @@
 </template>
 
 <script setup>
+	// import {
+	// 	API_loginAccountLogin
+	// } from '/api/user.js'
 	import {
 		ref,
-		reactive
+		reactive,
+		onMounted
 	} from 'vue';
 	const name = ref('')
 	const psdshow = ref(true)
-	const logloading = ref(false)
+	const logloading = ref(false) 
 	const checked = ref(false)
+	// 初始化
+	onMounted(() => {
+		// console.log(this.appApi)
+		 initRequest.API_loginAccountLogin().then(res => {
+			console.log(res)
+		})
+
+	});
 </script>
 
 <style scoped lang="scss">

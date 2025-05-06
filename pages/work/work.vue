@@ -63,7 +63,7 @@
 				{
 					img: "/static/work/icon8.png",
 					name: "合同",
-					url: ""
+					url: "/pages/work/contract/contractList"
 				},
 			]
 		},

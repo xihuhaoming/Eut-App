@@ -192,12 +192,12 @@
 						嘉兴星程电子有限公司
 					</view>
 					<view class="tasktext up-m-b-10" style="color:#3C82FE">TU-UI69-7329589 </view>
-					<view class="tasktext">企业名称：嘉兴星程电子有限公司</view>
-					<view class="tasktext">税号：7329580405</view>
+					<view class="tasktext">日期：2025.4.28</view>
+					<view class="tasktext">合同金额：<text style="color:red">28930.00</text></view>
 					<view class="tasktext">部门：数字中心</view>
 					<view class="tasktext">负责人：负责人</view>
-					<view class="tasktext">收款类型：对公转账</view>
-					<view class="tasktext">金额：<text style="color:red">28930.00</text></view>
+					<view class="tasktext">需支付金额：<text style="color:red">28930.00</text></view>
+					<view class="tasktext">产品：<text style="color:#3C82FE">IS9001</text></view>
 				</view>
 			</view>
 

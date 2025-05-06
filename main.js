@@ -1,17 +1,16 @@
 import App from './App'
 
 
+
+// #ifndef VUE3
+import Vue from 'vue'
+
 import appApi from './api/index';
 import uviewPlus from '@/uni_modules/uview-plus'
 // 引入请求封装，将app参数传递到配置中
 import {
 	initRequest
 } from './util/request/index'
-
-// #ifndef VUE3
-import Vue from 'vue'
-
-
 
 import './uni.promisify.adaptor'
 Vue.config.productionTip = false

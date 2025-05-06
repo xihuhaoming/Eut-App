@@ -7,13 +7,13 @@ let env = process.env.NODE_ENV,
 	aMapKey = '';
 if (platform === 'h5') {
 	if (env === 'production') {
-		APIURL = 'https://app.smkzz.com:8012/';
+		APIURL = 'https://erp.eut.prd4.weiniaokeji.cn/front';
 	} else {
-		APIURL = 'https://testapp.smkzz.com:8013/';
+		APIURL = 'https://app.smkzz.com:8012/';
 	}
 } else {
 	if (env === 'production') {
-		APIURL = 'https://app.smkzz.com:8012/';
+		APIURL = 'https://erp.eut.prd4.weiniaokeji.cn/front';
 	} else {
 		APIURL = 'https://app.smkzz.com:8012/';
 	}
