@@ -1,26 +1,26 @@
 <template>
 	<view>
-		<up-navbar title="开票申请" :placeholder="true" :autoBack="true" />
+		<up-navbar title="日常报销" :placeholder="true" :autoBack="true" />
 		<up-tabs :scrollable="false" :list="list" @click="tabclick"
 			itemStyle="padding:0 50rpx; height: 34rpx; margin:30rpx 0;" inactiveStyle="font-size: 28rpx;color: #B7C4D7;"
 			activeStyle="color: #092D5C;font-size:30rpx"></up-tabs>
 		<view class="content" v-if="tabIndex == 0">
-			<view class="typeTop up-flex u-row-center">
-				<hy-btn-group :list="typeList" v-model="typeValue" @itemClick="itemClick" :cancelSelectItem="false"
-					:unSelectedStyle="{background: '#F5F7FB',color: '#5A78A0',borderColor: '#F6F8FC',borderRadius:'30rpx'}"
-					:selectedStyle="{background: '#ECF1FF',color: '#3C82FE',borderColor: '#ECF1FF',borderRadius:'30rpx'}"></hy-btn-group>
-			</view>
 			<view class="xtitle bold">
 				申请信息
 			</view>
 			<view class="card">
 				<up-cell-group :border="false">
 					<up-cell title="申请部门" value="易尤特集团" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-					<up-cell title="开票流程" value="易尤特集团" :isLink="true" arrow-direction="right" :required="true"></up-cell>
+					<up-cell title="报销流程" value="易尤特集团" :isLink="true" arrow-direction="right" :required="true"></up-cell>
 					<up-cell title="办理人" value="易尤特集团" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-					<up-cell title="合同编号" value="易尤特集团" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-					<up-cell title="未开票金额" value="易尤特集团" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-					<up-cell title="开票流程中金额" value="易尤特集团" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+					<up-cell @click="lxshow = true" title="报销类型" :value="lxValue" :isLink="true" arrow-direction="right"
+						:required="true"></up-cell>
+					<!-- 报销类型选择 -->
+					<up-picker :show="lxshow" :columns="columns" @cancel="lxshow = false" @confirm="qeudlx"></up-picker>
+
+					<up-cell v-if="lxValue=='油卡'" title="选择油卡" value="易尤特集团" :isLink="true" arrow-direction="right"
+						:required="true"></up-cell>
+					<up-cell title="借支单" value="易尤特集团" :isLink="false" arrow-direction="right" :required="false"></up-cell>
 					<!-- 	<up-cell title="事项名称" isLink :required="true">
 						<template #value>
 							<input v-model="name" placeholder="请输入事项名称" type="text"
@@ -29,36 +29,46 @@
 					</up-cell> -->
 				</up-cell-group>
 				<view class="u-flex u-row-between u-col-center">
-					<view class="xtitle bold">添加产品</view>
+					<view class="xtitle bold">发票列表</view>
 					<view class="u-flex u-col-center">
-						<view class="up-m-r-10" style="font-size: 26rpx;color: #B7C4D7;">添加产品</view>
+						<view class="up-m-r-10" style="font-size: 26rpx;color: #B7C4D7;">添加发票</view>
 						<up-icon name="plus-circle" size="20px" color="#5A78A0"></up-icon>
 					</view>
 				</view>
 				<view class="card">
 					<up-cell-group :border="false">
-						<up-cell title="产品" value="IS9001" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-						<up-cell title="开票金额" value="5000" :isLink="false" arrow-direction="right" :required="true"></up-cell>
-						<view class="up-m-t-20 up-m-t-20 u-text-center" style="color:red">删除</view>
+						<up-cell title="发票类型" value="IS9001" :isLink="true" arrow-direction="right" :required="true"></up-cell>
+						<up-cell title="发票号码" value="5000" :isLink="false" arrow-direction="right" :required="true"></up-cell>
+						<view class="attachmentTitle u-flex up-m-t-30 u-row-between ">
+							<view class="attLeft">
+								发票图片：<text style="color: #B7C4D7;">请添加图片或文件</text>
+							</view>
+							<up-icon name="plus-circle" size="22px" color="#5A78A0"></up-icon>
+						</view>
+						<view class="u-flex up-m-t-30 u-row-between ">
+							<view class="updataLeft u-flex u-col-center">
+								<image src="/static/logo.png"></image>
+								<view class="up-m-l-10 name">文件名称</view>
+							</view>
+							<up-icon name="close-circle-fill" size="22px" color="#B7C4D7"></up-icon>
+						</view>
 					</up-cell-group>
 				</view>
 				<view class="xtitle bold">
-					企业信息
+					报销信息
 				</view>
 				<view class="card">
 					<up-cell-group :border="false">
-						<up-cell title="*企业名称" value="IS9001" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-						<up-cell title="税号" value="5000" :isLink="false" arrow-direction="right" :required="true"></up-cell>
-						<up-cell title="地址" value="5000" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-						<up-cell title="电话" value="5000" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-						<up-cell title="开票公司" value="5000" :isLink="false" arrow-direction="right" :required="true"></up-cell>
-						<up-cell title="开票电话" value="5000" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-						<up-cell title="开票联系方式" value="5000" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-						<up-cell title="银行账号" value="5000" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+						<up-cell title="是否预算内" value="5000" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+						<up-cell title="报销公司" value="IS9001" :isLink="true" arrow-direction="right" :required="true"></up-cell>
+						<up-cell title="收款人" value="5000" :isLink="false" arrow-direction="right" :required="true"></up-cell>
 						<up-cell title="开户行" value="5000" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-						<up-cell title="开票邮箱" value="5000" :isLink="false" arrow-direction="right" :required="true"></up-cell>
-						<up-cell title="开票金额" value="5000" :isLink="false" arrow-direction="right" :required="true"></up-cell>
+						<up-cell title="卡号" value="5000" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+						<up-cell title="报销金额" value="5000" :isLink="false" arrow-direction="right" :required="true"></up-cell>
 					</up-cell-group>
+					<!-- 					<view class="textClass up-m-t-20">
+						<textarea type="textarea" placeholder="请输入备注" border="surround" v-model="textValue"></textarea>
+					</view> -->
 				</view>
 				<!-- 			<view class="attachmentTitle u-flex up-m-t-30 u-row-between ">
 					<view class="attLeft">
@@ -154,13 +164,12 @@
 						<view class="ttright" style="color:#092D5C">已作废</view> -->
 					</view>
 					<view class="task-title up-m-t-20 bold">
-						河南微鸟科技网络有限公司
+						报销金额：500 元
 					</view>
-					<view class="tasktext up-m-b-10" style="color:#B7C4D7">S8D00F9A0D9-ASSD </view>
-					<view class="tasktext">开票金额：<text style="color:red">28930.00</text></view>
-					<view class="tasktext">合同编码：EUT-HT-LS-1901</view>
-					<view class="tasktext">部门：数字工程中心</view>
-					<view class="tasktext">负责人：易尤特</view>
+					<view class="tasktext up-m-b-10" style="color:#B7C4D7">董事长（研发） </view>
+					<view class="tasktext">是否预算内：预算内</view>
+					<view class="tasktext">打款金额：<text style="color:red">28930.00</text></view>
+					<view class="tasktext">备注：西塘镇2021-2022年度广告服务商入</view>
 				</view>
 			</view>
 
@@ -182,6 +191,12 @@
 		reactive,
 		onMounted
 	} from 'vue';
+
+	const lxshow = ref(false);
+	const columns = reactive([
+		['油卡', '办公用品']
+	]);
+	const lxValue = ref("")
 	const tabIndex = ref(0)
 	const keyword = ref("")
 	const list = reactive([{
@@ -245,7 +260,12 @@
 	const timeshow1 = ref(false);
 	const timeshow2 = ref(false);
 
-
+	// 选择报销类型
+	const qeudlx = (e) => {
+		console.log(e)
+		lxValue.value = e.value[0]
+		lxshow.value = false
+	}
 	// 选择类型Z 
 	const itemClick = (e) => {
 		console.log(e)

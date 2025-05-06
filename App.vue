@@ -28,5 +28,6 @@
 		line-height: 98rpx;
 		color:#fff;
 		font-size: 36rpx;
+		margin:0 auto;
 	}
 </style>

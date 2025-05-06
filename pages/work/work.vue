@@ -35,23 +35,23 @@
 			arr: [{
 				img: "/static/work/icon2.png",
 				name: "开票申请",
-				url: ""
+				url: "/pages/work/makeOut/addmake"
 			}, {
 				img: "/static/work/icon3.png",
 				name: "日常报销",
-				url: ""
+				url: "/pages/work/reimburse/addReimburse"
 			}, {
 				img: "/static/work/icon4.png",
 				name: "履约金",
-				url: ""
+				url: "/pages/work/performance/addPerformance"
 			}, {
 				img: "/static/work/icon5.png",
 				name: "收款申请",
-				url: ""
+				url: "/pages/work/receivepay/addReceivepay"
 			}, {
 				img: "/static/work/icon6.png",
 				name: "成本支出",
-				url: ""
+				url: "/pages/work/cost/addCost"
 			}, ]
 		}, {
 			title: "销售",
@@ -116,7 +116,7 @@
 			padding: 30rpx;
 
 			.title {
-				font-size: 36px;
+				font-size: 36rpx;
 				color: #092D5C;
 				border-bottom: 1rpx solid #E1E1E1;
 			}
