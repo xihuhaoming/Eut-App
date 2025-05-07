@@ -124,7 +124,9 @@
 	import {
 		API_getListByType
 	} from '../../api/home.js'
-
+	import {
+		onReachBottom
+	} from "@dcloudio/uni-app"
 	import {
 		ref,
 		reactive,
@@ -190,6 +192,9 @@
 	// 初始化
 	onMounted(() => {
 		worklistData();
+	})
+	onReachBottom(()=>{
+		console.log("触底")
 	})
 	// 列表
 	const worklistData = () => {

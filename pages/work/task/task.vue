@@ -101,8 +101,11 @@
 	import {
 		ref,
 		reactive,
-		onMounted
+		onMounted,
 	} from 'vue';
+	import { onReachBottom } from "@dcloudio/uni-app"
+	
+	
 	const list = reactive([{
 			name: '待处理'
 		},
@@ -171,6 +174,10 @@
 	// 		console.log(res)
 	// 	})
 	// }
+	// 
+	onReachBottom(()=>{
+		console.log("触底")
+	})
 	// 新增任务
 	const addnavTap = (url) => {
 		uni.navigateTo({

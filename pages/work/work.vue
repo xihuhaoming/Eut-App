@@ -78,7 +78,7 @@
 				{
 					img: "/static/work/icon10.png",
 					name: "采购管理",
-					url: ""
+					url: "/pages/work/procurement/addProcurement"
 				},
 				{
 					img: "/static/work/icon11.png",
@@ -88,7 +88,7 @@
 				{
 					img: "/static/work/icon12.png",
 					name: "入库",
-					url: ""
+					url: "/pages/work/warehousing/addWarehousing"
 				},
 			]
 		},
