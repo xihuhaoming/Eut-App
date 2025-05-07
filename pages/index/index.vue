@@ -7,8 +7,7 @@
 				</view>
 			</template>
 		</up-navbar>
-		<up-tabs :scrollable="false" :list="list" @click="tabclick"
-			itemStyle="height: 34rpx; margin:10rpx 0 30rpx 0;"
+		<up-tabs :scrollable="false" :list="list" @click="tabclick" itemStyle="height: 34rpx; margin:10rpx 0 30rpx 0;"
 			inactiveStyle="font-size: 28rpx;color: #B7C4D7;" activeStyle="color: #092D5C;font-size:30rpx"></up-tabs>
 		<view class="u-flex filter u-col-center u-row-around">
 			<!-- 时间 -->
@@ -122,7 +121,9 @@
 	import {
 		timeFrom
 	} from '@/uni_modules/uview-plus';
-
+	import {
+		API_getListByType
+	} from '../../api/home.js'
 
 	import {
 		ref,
@@ -187,8 +188,15 @@
 
 
 	// 初始化
-	onMounted(() => {});
-
+	onMounted(() => {
+		worklistData();
+	})
+	// 列表
+	const worklistData = () => {
+		API_getListByType().then(res => {
+			console.log(res)
+		})
+	}
 	// tab切换
 	const tabclick = (e) => {
 		console.log(e)

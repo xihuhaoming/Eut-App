@@ -18,7 +18,7 @@
 						<image class="cellimg" src="/static/user/yaos.png"></image>
 					</template>
 				</up-cell>
-				<up-cell class="tuic" title="退出登录" isLink url="/pages/componentsB/tag/tag">
+				<up-cell class="tuic" title="退出登录" isLink url="/pages/componentsB/tag/tag" @click="logouttap">
 					<template #icon>
 						<image class="cellimg" src="/static/user/tuic.png"></image>
 					</template>
@@ -30,12 +30,35 @@
 
 <script setup>
 	import {
+		userLogout
+	} from '/api/user.js'
+	import {
+		removeToken
+	} from '/util/auth.js'
+	import {
 		ref,
 		reactive,
 		onMounted
 	} from 'vue';
-	const leftClick = () => {
-		uni.navigateBack()
+	const logouttap = () => {
+		uni.showModal({
+			title: '提示：',
+			content: '请确认是否退出登录',
+			success: function(res) {
+				if (res.confirm) {
+					userLogout().then(res => {
+						console.log(res)
+						if (res.data.code == 200) {
+							removeToken();
+							uni.reLaunch({
+								url: "/pages/login/login"
+							})
+						}
+					})
+				} else if (res.cancel) {}
+			}
+		});
+
 	}
 </script>
 
@@ -92,8 +115,8 @@
 				image {
 					width: 20rpx;
 					height: 20rpx;
-					margin-right:5rpx;
-					margin-top:2rpx;
+					margin-right: 5rpx;
+					margin-top: 2rpx;
 				}
 			}
 

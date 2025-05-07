@@ -174,7 +174,7 @@
 				<view class="btnleft">放入公共池</view>
 				<view class="btnright">提交</view>
 			</view>
-			<view class="qued up-m-t-70">提交</view>
+			<!-- <view class="qued up-m-t-70">提交</view> -->
 		</view>
 
 		<!-- 选择时间 -->
@@ -194,8 +194,6 @@
 		onMounted
 	} from 'vue';
 
-	const tabIndex = ref(0)
-	const keyword = ref("")
 	const typeValue = ref(1)
 	const typeList = reactive([{
 		label: '增值税普通发票',
@@ -254,11 +252,6 @@
 	// 选择类型Z 
 	const itemClick = (e) => {
 		console.log(e)
-	}
-	// tab切换
-	const tabclick = (e) => {
-		console.log(e)
-		tabIndex.value = e.index
 	}
 	// 关闭筛选框
 	const closeDropdown = () => {

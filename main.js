@@ -1,16 +1,12 @@
 import App from './App'
 
 
-
+// import appApi from './api/index';
+import uviewPlus from '@/uni_modules/uview-plus'
+import '/util/request/http.interceptor.js'
 // #ifndef VUE3
 import Vue from 'vue'
 
-import appApi from './api/index';
-import uviewPlus from '@/uni_modules/uview-plus'
-// 引入请求封装，将app参数传递到配置中
-import {
-	initRequest
-} from './util/request/index'
 
 import './uni.promisify.adaptor'
 Vue.config.productionTip = false
@@ -34,12 +30,15 @@ uni.$u.setConfig({
 import {
 	createSSRApp
 } from 'vue'
+import { createPinia } from 'pinia'
+
 export function createApp() {
 	const app = createSSRApp(App)
-	// 引入请求封装
-	initRequest(app)
-
-	app.mixin(appApi);
+	
+	// 实例化pina
+	const pinia = createPinia()
+	console.log(pinia)
+	app.use(pinia)
 	app.use(uviewPlus)
 	return {
 		app

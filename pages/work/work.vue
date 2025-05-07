@@ -18,6 +18,7 @@
 </template>
 
 <script setup>
+
 	import {
 		ref,
 		reactive,
@@ -72,7 +73,7 @@
 			arr: [{
 					img: "/static/work/icon9.png",
 					name: "领用申请",
-					url: ""
+					url: "/pages/work/drawOn/adddrawOn"
 				},
 				{
 					img: "/static/work/icon10.png",

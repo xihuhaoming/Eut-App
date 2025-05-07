@@ -1,4 +1,4 @@
-const TokenKey = 'Token';
+const TokenKey = 'token';
 
 
 export function getToken() {

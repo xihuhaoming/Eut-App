@@ -1,8 +1,9 @@
 <template>
 	<view>
 		<up-navbar title="任务&通知" :placeholder="true" :autoBack="true" />
-		<up-tabs :scrollable="false" :list="list" @click="tabclick" itemStyle="padding:0 50rpx; height: 34rpx; margin:30rpx 0;"
-			inactiveStyle="font-size: 28rpx;color: #B7C4D7;" activeStyle="color: #092D5C;font-size:30rpx"></up-tabs>
+		<up-tabs :scrollable="false" :list="list" @click="tabclick"
+			itemStyle="padding:0 50rpx; height: 34rpx; margin:30rpx 0;" inactiveStyle="font-size: 28rpx;color: #B7C4D7;"
+			activeStyle="color: #092D5C;font-size:30rpx"></up-tabs>
 		<view class="up-p-t-20" style="background:#ffffff;">
 			<up-search class="up-m-b-20" placeholder="请输入查找内容" v-model="keyword" :showAction="false" bgColor="#F6F8FC"
 				height="40"></up-search>
@@ -95,6 +96,9 @@
 
 <script setup>
 	import {
+		API_getListByType
+	} from '../../api/home.js'
+	import {
 		ref,
 		reactive,
 		onMounted
@@ -158,6 +162,15 @@
 	const timeshow2 = ref(false);
 
 	const keyword = ref('')
+	onMounted(() => {
+		// worklistData();
+	})
+	// 列表
+	// const worklistData = () => {
+	// 	API_getListByType().then(res => {
+	// 		console.log(res)
+	// 	})
+	// }
 	// 新增任务
 	const addnavTap = (url) => {
 		uni.navigateTo({
@@ -165,10 +178,10 @@
 		})
 	}
 	// tab切换
-	const tabclick = (e)=>{
+	const tabclick = (e) => {
 		console.log(e)
 	}
-	
+
 	// 关闭筛选框
 	const closeDropdown = () => {
 		// this.$refs.uDropdownRef.close();
@@ -272,13 +285,15 @@
 			line-height: 50rpx;
 		}
 	}
-	.tianj{
-		width:120rpx;
-		height:120rpx;
+
+	.tianj {
+		width: 120rpx;
+		height: 120rpx;
 		position: absolute;
-		right:10rpx;
-		bottom:15vh;
+		right: 10rpx;
+		bottom: 15vh;
 	}
+
 	.slot-content {
 		background: #fff;
 

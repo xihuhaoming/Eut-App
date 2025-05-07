@@ -12,7 +12,8 @@
 		</view>
 		<view class="yhm-box">
 			<view class="name">登录密码</view>
-			<up-input class="yhm-iput" placeholder="请输入密码" border="bottom" clearable :type="psdshow?'password':'text'">
+			<up-input v-model="password" class="yhm-iput" placeholder="请输入密码" border="bottom" clearable
+				:type="psdshow?'password':'text'">
 				<template #suffix>
 					<up-icon @click="psdshow=false" v-if="psdshow" name="eye-fill" color="#B7C4D7" size="24"></up-icon>
 					<up-icon @click="psdshow=true" v-else name="eye-off" color="#B7C4D7" size="24"></up-icon>
@@ -20,10 +21,10 @@
 			</up-input>
 		</view>
 		<up-button color="#3C82FE" class="up-m-t-60" type="primary" :loading="logloading" loadingText="登录中" text="登录"
-			shape="circle"></up-button>
+			shape="circle" @click="Submit"></up-button>
 		<view class="u-flex up-m-t-35 u-col-center">
 			<up-checkbox-group>
-				<up-checkbox v-model="checked" shape="circle" label=""></up-checkbox>
+				<up-checkbox v-model="checked" shape="circle" label="" @change="checkChange"></up-checkbox>
 			</up-checkbox-group>
 			<view class="checkedtext">我已阅读并同意以下协议<text style="color:#3C82FE">《用户使用协议》</text></view>
 		</view>
@@ -31,26 +32,61 @@
 </template>
 
 <script setup>
-	// import {
-	// 	API_loginAccountLogin
-	// } from '/api/user.js'
+	import {
+		login
+	} from '/api/user.js'
 	import {
 		ref,
 		reactive,
 		onMounted
 	} from 'vue';
-	const name = ref('')
+	import {
+		useCounterStore
+	} from '../../store/counter';
+	import {
+		setToken,
+		getToken
+	} from '/util/auth.js'
+	const store = useCounterStore();
+	const name = ref('13758340229')
+	const password = ref('123456')
 	const psdshow = ref(true)
-	const logloading = ref(false) 
+	const logloading = ref(false)
 	const checked = ref(false)
 	// 初始化
 	onMounted(() => {
 		// console.log(this.appApi)
-		 initRequest.API_loginAccountLogin().then(res => {
-			console.log(res)
-		})
 
 	});
+	const checkChange = (e) => {
+		console.log(e)
+		checked.value = e
+	}
+	const Submit = () => {
+		console.log(uni)
+		if (!name.value) return uni.$u.toast("请输入用户名")
+		if (!password.value) return uni.$u.toast("请输入密码")
+		if (!checked.value) return uni.$u.toast("请阅读并同意协议")
+		let obj = {
+			userName: name.value,
+			passWord: password.value
+		}
+		login(obj).then(res => {
+			// console.log(res)
+			let {
+				code,
+				data
+			} = res;
+			if (code == 200) {
+				setToken(data.token)
+				store.setUserinfo(data.userInfo);
+				uni.switchTab({
+					url: '/pages/index/index'
+				})
+			}
+		})
+
+	}
 </script>
 
 <style scoped lang="scss">
