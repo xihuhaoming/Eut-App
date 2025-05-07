@@ -14,20 +14,22 @@
 
 <style lang="scss">
 	@import "@/uni_modules/uview-plus/index.scss";
+
 	/*每个页面公共css */
-	view{
+	view {
 		box-sizing: border-box;
 	}
+
 	.qued {
 		width: 638rpx;
 		height: 98rpx;
 		background: #3C82FE;
 		box-shadow: 0rpx 8rpx 21rpx 0rpx rgba(60, 130, 254, 0.3);
 		border-radius: 59rpx;
-		text-align:center;
+		text-align: center;
 		line-height: 98rpx;
-		color:#fff;
+		color: #fff;
 		font-size: 36rpx;
-		margin:0 auto;
+		margin: 0 auto;
 	}
 </style>

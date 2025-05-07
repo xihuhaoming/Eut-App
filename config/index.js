@@ -9,7 +9,7 @@ if (platform === 'h5') {
 	if (env === 'production') {
 		APIURL = 'https://erp.eut.prd4.weiniaokeji.cn/front';
 	} else {
-		APIURL = 'https://app.smkzz.com:8012/';
+		APIURL = 'https://erp.eut.prd4.weiniaokeji.cn/front';
 	}
 } else {
 	if (env === 'production') {
