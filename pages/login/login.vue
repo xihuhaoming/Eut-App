@@ -63,6 +63,7 @@
 		checked.value = e
 	}
 	const Submit = () => {
+
 		console.log(uni)
 		if (!name.value) return uni.$u.toast("请输入用户名")
 		if (!password.value) return uni.$u.toast("请输入密码")
@@ -71,18 +72,21 @@
 			userName: name.value,
 			passWord: password.value
 		}
+		uni.showLoading()
 		login(obj).then(res => {
 			// console.log(res)
 			let {
 				code,
 				data
 			} = res;
+			uni.hideLoading()
 			if (code == 200) {
 				setToken(data.token)
 				store.setUserinfo(data.userInfo);
 				uni.switchTab({
 					url: '/pages/index/index'
 				})
+				uni.$u.hideLoding();
 			}
 		})
 

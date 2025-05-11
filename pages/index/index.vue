@@ -3,6 +3,9 @@
 		<up-navbar class="top" title="待办事项" :placeholder="true">
 			<template #right>
 				<view class="u-nav-slot">
+					<view style="position: relative;">
+						<up-badge :type="type" :value="ReadCountData" :offset="[-5,-20]" :absolute="true"></up-badge>
+					</view>
 					<image @click="msgClick" class="msgicon" src="/static/msg.png"></image>
 				</view>
 			</template>
@@ -42,17 +45,11 @@
 								<view class="ttleft1 up-m-r-20"></view>
 								<view class="ttright">工作组名称</view>
 							</view>
-							<hy-btn-group class="up-m-t-30 up-m-l-20" :list="workList" v-model="workValue" @itemClick="itemClick1"
-								multiple :unSelectedStyle="{background: '#F5F7FB',color: '#5A78A0',borderColor: '#F5F7FB'}"
+							<hy-btn-group class="up-m-t-30 up-m-l-20" :label="categoryName" :value="categoryId" :list="workList"
+								v-model="workValue" @itemClick="itemClick" multiple
+								:unSelectedStyle="{background: '#F5F7FB',color: '#5A78A0',borderColor: '#F5F7FB'}"
 								:selectedStyle="{background: '#ECF1FF',color: '#3C82FE',borderColor: '#ECF1FF'}"></hy-btn-group>
-							<!-- 工作组名称 -->
-							<view class="typeTitle u-flex u-col-center up-m-t-30">
-								<view class="ttleft1 up-m-r-20"></view>
-								<view class="ttright">工作组名称</view>
-							</view>
-							<hy-btn-group class="up-m-t-30 up-m-l-20" :list="workList2" v-model="workValue2" @itemClick="itemClick1"
-								multiple :unSelectedStyle="{background: '#F5F7FB',color: '#5A78A0',borderColor: '#F5F7FB'}"
-								:selectedStyle="{background: '#ECF1FF',color: '#3C82FE',borderColor: '#ECF1FF'}"></hy-btn-group>
+
 						</view>
 						<view class="slotCon up-flex up-text-center u-row-around up-p-t-40 up-p-b-40">
 							<view class="timeBtn" @click="chongzTime">重置</view>
@@ -64,49 +61,30 @@
 			</up-dropdown>
 		</view>
 
-
-		<view class="card-box u-flex up-m-t-30">
-			<view class="itemIcon">审批</view>
-			<view class="itemBot up-m-l-20">
-				<view class="itemType">开票申请</view>
-				<view class="itemCard up-m-t-20">
-					<view class="cardTitle bold">XXX 发起的开票申请</view>
-					<view class="cardxt">部门：</view>
-					<view class="cardcon">XXX 发起的开票申请</view>
-					<view class="cardxt">客户部门：</view>
-					<view class="cardcon">XXX 发起的开票申请</view>
-					<view class="cardxt">税号：</view>
-					<view class="cardcon">91330402759098461N</view>
-					<view class="cardxt">金额：</view>
-					<view class="cardcon">91330402759098461N</view>
-					<view class="up-flex u-row-around up-m-t-30">
-						<view class="card-btnl">拒绝</view>
-						<view class="card-btnr">同意</view>
+		<block v-for="(item,index) in listData.value">
+			<view class="card-box u-flex up-m-t-30">
+				<view class="itemIcon" v-if="item.type==0">任务</view>
+				<view class="itemIcon" v-if="item.type==1">审批</view>
+				<view class="itemBot up-m-l-20">
+					<view class="itemType">{{item.workFlowName}}</view>
+					<view class="itemCard up-m-t-20">
+						<view class="cardTitle bold">{{item.formData.sendUserName}}发起的开票申请</view>
+						<view class="cardxt">部门：</view>
+						<view class="cardcon">{{item.formData.departName}}</view>
+						<view class="cardxt">客户部门：</view>
+						<view class="cardcon">{{item.formData.customerName}}</view>
+						<view class="cardxt">税号：</view>
+						<view class="cardcon">{{item.formData.taxNo}}</view>
+						<view class="cardxt">金额：</view>
+						<view class="cardcon">{{item.formData.amount}}</view>
+						<view class="up-flex u-row-around up-m-t-30">
+							<view class="card-btnl">拒绝</view>
+							<view class="card-btnr">同意</view>
+						</view>
 					</view>
 				</view>
 			</view>
-		</view>
-		<view class="card-box u-flex up-m-t-30">
-			<view class="itemIcon">审批</view>
-			<view class="itemBot up-m-l-20">
-				<view class="itemType">开票申请</view>
-				<view class="itemCard up-m-t-20">
-					<view class="cardTitle bold">XXX 发起的开票申请</view>
-					<view class="cardxt">部门：</view>
-					<view class="cardcon">XXX 发起的开票申请</view>
-					<view class="cardxt">客户部门：</view>
-					<view class="cardcon">XXX 发起的开票申请</view>
-					<view class="cardxt">税号：</view>
-					<view class="cardcon">91330402759098461N</view>
-					<view class="cardxt">金额：</view>
-					<view class="cardcon">91330402759098461N</view>
-					<view class="up-flex u-row-around up-m-t-30">
-						<view class="card-btnl">拒绝</view>
-						<view class="card-btnr">同意</view>
-					</view>
-				</view>
-			</view>
-		</view>
+		</block>
 		<!-- 选择时间 -->
 		<up-datetime-picker :minDate="1735660800000" :hasInput="false" class="timeView" hasInput :show="timeshow1"
 			v-model="startTime" mode="date" placeholder="开始时间" @confirm="confirm1"
@@ -122,10 +100,16 @@
 		timeFrom
 	} from '@/uni_modules/uview-plus';
 	import {
-		API_getListByType
+		API_getListByType,
+		API_getWorkGroupList
 	} from '../../api/home.js'
 	import {
-		onReachBottom
+		noticeUnReadCount
+	} from '../../api/user.js'
+	import {
+		onReachBottom,
+		onLoad,
+		onReady
 	} from "@dcloudio/uni-app"
 	import {
 		ref,
@@ -145,61 +129,89 @@
 	]);
 	const typeList = reactive([{
 		label: '任务',
-		value: 1
+		value: 0
 	}, {
 		label: '通知',
-		value: 2
+		value: 1
 	}]);
 
-	const workList = reactive([{
-			label: '采购流程',
-			value: 1
-		}, {
-			label: '入库流程',
-			value: 2
-		},
-		{
-			label: '合同流程',
-			value: 3
-		},
-		{
-			label: '工作流流程',
-			value: 4
-		},
-	]);
-	const workList2 = reactive([{
-			label: '采购流程',
-			value: 1
-		}, {
-			label: '入库流程',
-			value: 2
-		},
-		{
-			label: '合同流程',
-			value: 3
-		}
-	]);
+	const workList = ref([]);
+	// const workList2 = reactive([{
+	// 		label: '采购流程',
+	// 		value: 1
+	// 	}, {
+	// 		label: '入库流程',
+	// 		value: 2
+	// 	},
+	// 	{
+	// 		label: '合同流程',
+	// 		value: 3
+	// 	}
+	// ]);
 	const typeValue = reactive([])
 	const workValue = reactive([])
 	const workValue2 = reactive([])
 	const uDropdownRef = ref(null)
-	const startTime = ref('开始时间')
-	const endTime = ref('结束时间')
+	const startTime = ref('2025-05-11 11:21:51')
+	const endTime = ref('2025-05-11 11:21:51')
 	const timeshow1 = ref(false);
 	const timeshow2 = ref(false);
+	const pageNum = ref(1)
+	const listData = reactive([])
+	const ReadCountData = ref()
+	onReady(() => {
 
-
-	// 初始化
-	onMounted(() => {
-		worklistData();
 	})
-	onReachBottom(()=>{
+	// 初始化
+	onMounted(() => {})
+	onLoad(() => {
+		worklistData();
+		noticeData();
+		WorkGroupListFn();
+	})
+	onReachBottom(() => {
 		console.log("触底")
 	})
+	const WorkGroupListFn = () => {
+		API_getWorkGroupList().then(res => {
+			console.log(res.data)
+
+			res.data.forEach((item, index) => {
+				// console.log(item)
+				item.label = item.categoryName
+				item.value = item.categoryId
+			})
+			workList.value.push(...res.data)
+
+			console.log(workList.value)
+		})
+	}
+	// 未读消息
+	const noticeData = () => {
+		noticeUnReadCount().then(res => {
+			console.log(res)
+			ReadCountData.value = res.data
+		})
+	}
 	// 列表
 	const worklistData = () => {
-		API_getListByType().then(res => {
+		let permission = workValue.join(',')
+		// console.log(startTime.value,endTime.value)
+		// if (startTime.value == '开始时间') {
+		// 	startTime.value = ""
+		// }
+		// if (endTime.value == '结束时间') {
+		// 	endTime.value = ""
+		// }
+		API_getListByType({
+			startTime: startTime.value,
+			endTime: endTime.value,
+			// workGroupId:permission,
+			type: typeValue[0]
+		}).then(res => {
+			listData.value = res.data
 			console.log(res)
+
 		})
 	}
 	// tab切换
@@ -247,6 +259,8 @@
 	}
 	// 时间确定
 	const SubmitTime = () => {
+		// console.log(workValue)
+		worklistData();
 		uDropdownRef.value.close()
 		typeValue.length = 0;
 		workValue.length = 0;
@@ -268,6 +282,10 @@
 <style scoped lang="scss">
 	::v-deep .u-navbar__content__left {
 		display: none !important;
+	}
+
+	::v-deep .u-navbar__content__right {
+		right: 20rpx;
 	}
 
 	::v-deep .u-dropdown {

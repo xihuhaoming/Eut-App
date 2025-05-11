@@ -48,14 +48,22 @@ export function get(url, params, resolveType, type = 'get') {
 	return new Promise((resolve, reject) => {
 		http[type](APIURL + url, params).then(res => {
 			console.log(res.data.code)
-			// 3.根据自己的接口响应状态码来配置，我这里配置后台给的code大于0代表请求成功
-			if (res.data.code == 200) {
-				resolve(res.data)
-			} else if (res.data.code == 500) {
+			let data = res.data;
+			if (data.code == 200) {
+				resolve(data)
+			} else if (data.code == 500) {
 				toast(res.data.msg)
+			} else if (data.code == 401) {
+				reject('请重新登录');
+				toast('请重新登录')
+				setTimeout(() => {
+					uni.navigateTo({
+						url: '/pages/login/login'
+					})
+				}, 1000)
 			} else {
 				toast('网络错误')
-				reject(res.data);
+				reject(data);
 			}
 		}).catch(err => {
 			// 4.检查网络是否可用，返回自己需要抛出的错误

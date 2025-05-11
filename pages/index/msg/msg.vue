@@ -2,41 +2,60 @@
 	<view>
 		<up-navbar title="消息中心" :placeholder="true" :autoBack="true" />
 		<view class="msgbox">
-			<view class="u-flex msgItem" @click="detileClick">
-				<view class="itemLeft up-m-r-20">通知</view>
-				<view class="itemright">
-					<view class="itemr-top up-flex u-row-between">
-						<view class="up-m-r-80">消息通知</view>
-						<view>2024-04-12 16:00</view>
+			<!-- <view v-if="list.length!=0"> -->
+			<view>
+				<block v-for="(item,index) in list.value" :key="index">
+					<view class="u-flex msgItem" @click="detileClick(item.noticeId)">
+						<view class="itemLeft up-m-r-20" v-if="item.type==0">公告</view>
+						<view class="itemLeft up-m-r-20" v-if="item.type==1">通知</view>
+						<view class="itemright">
+							<view class="itemr-top up-flex u-row-between">
+								<view class="up-m-r-80">{{item.title}}</view>
+								<view>{{item.createInDate}}</view>
+							</view>
+							<view class="itemr-bot up-m-t-20">{{item.content}}</view>
+						</view>
 					</view>
-					<view class="itemr-bot up-m-t-20">消息通知消息通知消息通知消息通知消息通知消息通知消息通知</view>
-				</view>
+				</block>
 			</view>
-			<view class="u-flex msgItem">
-				<view class="itemLeft up-m-r-20" style="background:#3C82FE">公告</view>
-				<view class="itemright">
-					<view class="itemr-top up-flex u-row-between">
-						<view class="up-m-r-80">消息通知</view>
-						<view>2024-04-12 16:00</view>
-					</view>
-					<view class="itemr-bot up-m-t-20">消息通知消息通知消息通知消息通知消息通知消息通知消息通知</view>
-				</view>
-			</view>
+			<!-- <up-empty class="up-m-t-50" mode="message" icon="/static/ques.png"></up-empty> -->
 		</view>
 	</view>
 </template>
 
 <script setup>
 	import {
+		noticeList
+	} from '/api/user.js'
+	import {
 		ref,
 		reactive,
 		onMounted
 	} from 'vue';
-	const detileClick = () => {
-		uni.navigateTo({
-			url: "/pages/index/msg/msgdetile"
+	import {
+		onLoad
+	} from '@dcloudio/uni-app'
+
+
+	const list = reactive([])
+	onLoad(async () => {
+		noticeListData()
+	})
+	const noticeListData = () => {
+		uni.showLoading({})
+		noticeList().then(res => {
+			console.log(res.data)
+			list.value = res.data
+			uni.hideLoading()
+			console.log(list.value)
 		})
-		route('/pages/index/msg/msgdetile');
+	}
+	const detileClick = (noticeId) => {
+		// console.log(noticeId)
+		// return;
+		uni.navigateTo({
+			url: "/pages/index/msg/msgdetile?noticeId=" + noticeId
+		})
 	}
 </script>
 

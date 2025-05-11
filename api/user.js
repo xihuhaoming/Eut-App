@@ -20,3 +20,23 @@ export function login(params) {
 export function userLogout(params) {
 	return post('/user/logout', params)
 }
+// 修改头像 
+export function changeAvatar(params) {
+	return post('/user/changeAvatar', params)
+}
+// 消息列表
+export function noticeList(params) {
+	return get('/notice/list', {
+		params
+	})
+}
+// 消息详情
+export function noticeDetail(params) {
+	return get('/notice/detail/'+params)
+}
+// 未读消息
+export function noticeUnReadCount(params) {
+	return get('/notice/unReadCount', {
+		params
+	})
+}
