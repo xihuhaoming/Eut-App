@@ -2,8 +2,8 @@
 	<view>
 		<up-navbar title="消息中心" :placeholder="true" :autoBack="true" />
 		<view class="msgbox">
-			<!-- <view v-if="list.length!=0"> -->
-			<view>
+			<view v-if="list.value.length!=0">
+			<!-- <view> -->
 				<block v-for="(item,index) in list.value" :key="index">
 					<view class="u-flex msgItem" @click="detileClick(item.noticeId)">
 						<view class="itemLeft up-m-r-20" v-if="item.type==0">公告</view>
@@ -18,7 +18,7 @@
 					</view>
 				</block>
 			</view>
-			<!-- <up-empty class="up-m-t-50" mode="message" icon="/static/ques.png"></up-empty> -->
+			<up-empty v-else class="up-m-t-50" mode="message" icon="/static/ques.png"></up-empty>
 		</view>
 	</view>
 </template>

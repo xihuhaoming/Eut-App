@@ -32,4 +32,5 @@
 		font-size: 36rpx;
 		margin: 0 auto;
 	}
+
 </style>

@@ -43,9 +43,9 @@
 			</view>
 			<view class="card">
 				<up-cell-group :border="false">
-					<up-cell title="截止日期" value="已选 15 人" :isLink="true" arrow-direction="right"
+					<up-cell title="任务人" value="已选 15 人" :isLink="true" arrow-direction="right"
 						:required="true"></up-cell>
-					<up-cell title="事项名称" value="已选 1 人" :isLink="true" arrow-direction="right"
+					<up-cell title="抄送人" value="已选 1 人" :isLink="true" arrow-direction="right"
 						:required="true"></up-cell>
 				</up-cell-group>
 			</view>

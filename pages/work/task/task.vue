@@ -62,24 +62,100 @@
 				</up-dropdown>
 			</view>
 		</view>
-		<view class="taskbox">
-			<view class="taskItem">
-				<view class="titemTop u-flex u-row-between up-p-b-15">
-					<view class="ttleft u-flex u-col-center">
-						<image src="/static/work/time.png"></image>
-						<view>2023.03.05 16:00</view>
+		<view class="taskbox" v-if="typeIndex==0">
+			<block v-if="todoList.value!=null">
+				<view class="taskItem" v-for="(item,index) in todoList.value" :key="index">
+					<view class="titemTop u-flex u-row-between up-p-b-15">
+						<view class="ttleft u-flex u-col-center">
+							<image src="/static/work/time.png"></image>
+							<view>{{item.createInDate}}</view>
+						</view>
+						<view class="ttright" v-if="item.status==0">待确认</view>
+						<view class="ttright" v-if="item.status==1">确认中</view>
+						<view class="ttright" v-if="item.status==2">已完成</view>
+						<view class="ttright" v-if="item.status==3">已驳回</view>
 					</view>
-					<view class="ttright">待确认</view>
+					<view class="task-title up-m-t-20 bold">
+						{{item.title}}
+					</view>
+					<view class="tasktext" v-if="item.type==0">类型：任务</view>
+					<view class="tasktext" v-if="item.type==1">类型：通知</view>
+					<view class="tasktext">下发人：{{item.createUserName}}</view>
+					<view class="tasktext">截止时间：{{item.endTime}}</view>
 				</view>
-				<view class="task-title up-m-t-20 bold">
-					待处理事项的的名称
+			</block>
+			<up-empty v-else class="up-m-t-50" mode="list" icon="/static/ques.png"></up-empty>
+		</view>
+
+		<view class="taskbox" v-if="typeIndex==1">
+			<block v-if="completedList.value!=null">
+				<view class="taskItem" v-for="(item,index) in completedList.value" :key="index">
+					<view class="titemTop u-flex u-row-between up-p-b-15">
+						<view class="ttleft u-flex u-col-center">
+							<image src="/static/work/time.png"></image>
+							<view>{{item.createInDate}}</view>
+						</view>
+						<view class="ttright" v-if="item.status==0">待确认</view>
+						<view class="ttright" v-if="item.status==1">确认中</view>
+						<view class="ttright" v-if="item.status==2">已完成</view>
+						<view class="ttright" v-if="item.status==3">已驳回</view>
+					</view>
+					<view class="task-title up-m-t-20 bold">
+						{{item.title}}
+					</view>
+					<view class="tasktext" v-if="item.type==0">类型：任务</view>
+					<view class="tasktext" v-if="item.type==1">类型：通知</view>
+					<view class="tasktext">下发人：{{item.createUserName}}</view>
+					<view class="tasktext">截止时间：{{item.endTime}}</view>
 				</view>
-				<view class="tasktext">类型：任务</view>
-				<view class="tasktext">下发人：姓名</view>
-				<view class="tasktext">截止时间：2023.04.08</view>
-				<view class="tasktext">状态：进行中</view>
-				<view class="tasktext">当前进度：20/200</view>
-			</view>
+			</block>
+			<up-empty v-else class="up-m-t-50" mode="list" icon="/static/ques.png"></up-empty>
+		</view>
+		<view class="taskbox" v-if="typeIndex==2">
+			<block v-if="issuedList.value!=null">
+				<view class="taskItem" v-for="(item,index) in issuedList.value" :key="index">
+					<view class="titemTop u-flex u-row-between up-p-b-15">
+						<view class="ttleft u-flex u-col-center">
+							<image src="/static/work/time.png"></image>
+							<view>{{item.createInDate}}</view>
+						</view>
+						<view class="ttright">待确认:{{item.waitConfirmCount}}</view>
+					</view>
+					<view class="task-title up-m-t-20 bold">
+						{{item.title}}
+					</view>
+					<view class="tasktext" v-if="item.type==0">类型：任务</view>
+					<view class="tasktext" v-if="item.type==1">类型：通知</view>
+					<view class="tasktext">下发人：{{item.createUserName}}</view>
+					<view class="tasktext">截止时间：{{item.endTime}}</view>
+					<view class="tasktext">状态：{{item.status}}</view>
+					<view class="tasktext">当前进度：{{item.completedCount}}/{{item.totalCount}}</view>
+				</view>
+			</block>
+			<up-empty v-else class="up-m-t-50" mode="list" icon="/static/ques.png"></up-empty>
+		</view>
+		<view class="taskbox" v-if="typeIndex==3">
+			<block v-if="copyList.value!=null">
+				<view class="taskItem" v-for="(item,index) in copyList.value" :key="index">
+					<view class="titemTop u-flex u-row-between up-p-b-15">
+						<view class="ttleft u-flex u-col-center">
+							<image src="/static/work/time.png"></image>
+							<view>{{item.createInDate}}</view>
+						</view>
+						<view class="ttright">待确认:{{item.waitConfirmCount}}</view>
+					</view>
+					<view class="task-title up-m-t-20 bold">
+						{{item.title}}
+					</view>
+					<view class="tasktext" v-if="item.type==0">类型：任务</view>
+					<view class="tasktext" v-if="item.type==1">类型：通知</view>
+					<view class="tasktext">下发人：{{item.createUserName}}</view>
+					<view class="tasktext">截止时间：{{item.endTime}}</view>
+					<view class="tasktext">状态：{{item.status}}</view>
+					<view class="tasktext">当前进度：{{item.completedCount}}/{{item.totalCount}}</view>
+				</view>
+			</block>
+			<up-empty v-else class="up-m-t-50" mode="list" icon="/static/ques.png"></up-empty>
 		</view>
 		<image src="/static/work/jia.png" class="tianj" @click="addnavTap('/pages/work/task/addtask')"></image>
 
@@ -96,16 +172,19 @@
 
 <script setup>
 	import {
-		API_getListByType
-	} from '../../api/home.js'
+		API_taskList
+	} from '/api/task.js'
 	import {
 		ref,
 		reactive,
 		onMounted,
 	} from 'vue';
-	import { onReachBottom } from "@dcloudio/uni-app"
-	
-	
+	import {
+		onReachBottom,
+		onLoad
+	} from "@dcloudio/uni-app"
+
+
 	const list = reactive([{
 			name: '待处理'
 		},
@@ -155,6 +234,7 @@
 			value: 3
 		}
 	]);
+	const typeIndex = ref('0')
 	const typeValue = reactive([])
 	const workValue = reactive([])
 	const workValue2 = reactive([])
@@ -163,19 +243,44 @@
 	const endTime = ref('结束时间')
 	const timeshow1 = ref(false);
 	const timeshow2 = ref(false);
-
 	const keyword = ref('')
-	onMounted(() => {
-		// worklistData();
+
+	const todoList = reactive([])
+	const completedList = reactive([])
+	const issuedList = reactive([])
+	const copyList = reactive([])
+	onLoad(() => {
+		tasklistData();
 	})
+
 	// 列表
-	// const worklistData = () => {
-	// 	API_getListByType().then(res => {
-	// 		console.log(res)
-	// 	})
-	// }
-	// 
-	onReachBottom(()=>{
+	const tasklistData = (type) => {
+		let noticeTypes = typeValue.join(',')
+		let startTimeData, endTimeData;
+		startTimeData = startTime.value
+		endTimeData = endTime.value
+		if (startTime.value == '开始时间') {
+			startTimeData = ""
+		}
+		if (endTime.value == '结束时间') {
+			endTimeData = ""
+		}
+		API_taskList({
+			type: type,
+			startTime: startTimeData,
+			endTime: endTimeData,
+			noticeTypes: noticeTypes,
+			title: keyword.value
+		}).then(res => {
+			console.log(res)
+			todoList.value = res.data.todoList
+			completedList.value = res.data.completedList
+			issuedList.value = res.data.issuedList
+			copyList.value = res.data.copyList
+		})
+	}
+
+	onReachBottom(() => {
 		console.log("触底")
 	})
 	// 新增任务
@@ -187,6 +292,8 @@
 	// tab切换
 	const tabclick = (e) => {
 		console.log(e)
+		typeIndex.value = e.index
+		tasklistData(e.index)
 	}
 
 	// 关闭筛选框

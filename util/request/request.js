@@ -23,13 +23,29 @@ function isNetworkError() {
 // 2.请求统一配置
 export function post(url, params, resolveType, type = 'post') {
 	return new Promise((resolve, reject) => {
+		uni.showLoading({})
 		http[type](APIURL + url, params).then(res => {
 			// 3.根据自己的接口响应状态码来配置，我这里配置后台给的code大于0代表请求成功
-			if (Number(res.data.code) == 200) {
-				resolve(res.data)
-			} else {
+			let data = res.data;
+			if (data.code == 200) {
+				uni.hideLoading()
+				resolve(data)
+			} else if (data.code == 500) {
+				uni.hideLoading()
 				toast(res.data.msg)
-				reject(res.data);
+			} else if (data.code == 401) {
+				uni.hideLoading()
+				// reject('请重新登录');
+				toast('请重新登录')
+				setTimeout(() => {
+					uni.navigateTo({
+						url: '/pages/login/login'
+					})
+				}, 1000)
+			} else {
+				uni.hideLoading()
+				toast('网络错误')
+				reject(data);
 			}
 		}).catch(err => {
 			// 4.检查网络是否可用，返回自己需要抛出的错误
@@ -46,14 +62,18 @@ export function post(url, params, resolveType, type = 'post') {
 };
 export function get(url, params, resolveType, type = 'get') {
 	return new Promise((resolve, reject) => {
+		uni.showLoading({})
 		http[type](APIURL + url, params).then(res => {
-			console.log(res.data.code)
+			// console.log(res.data.code)
 			let data = res.data;
 			if (data.code == 200) {
+				uni.hideLoading()
 				resolve(data)
 			} else if (data.code == 500) {
+				uni.hideLoading()
 				toast(res.data.msg)
 			} else if (data.code == 401) {
+				uni.hideLoading()
 				reject('请重新登录');
 				toast('请重新登录')
 				setTimeout(() => {
@@ -62,10 +82,12 @@ export function get(url, params, resolveType, type = 'get') {
 					})
 				}, 1000)
 			} else {
+				uni.hideLoading()
 				toast('网络错误')
 				reject(data);
 			}
 		}).catch(err => {
+			uni.hideLoading()
 			// 4.检查网络是否可用，返回自己需要抛出的错误
 			isNetworkError().then(isNone => {
 				toast(isNone ? '当前无网络，请检查后重试' : '网络错误')

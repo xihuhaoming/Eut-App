@@ -17,6 +17,6 @@ export function API_getWorkGroupList(params) {
 }
 
 // 修改密码
-export function changePwd(params) {
-	return post('/user/changePwd', params)
-}
+// export function changePwd(params) {
+// 	return post('/user/changePwd', params)
+// }

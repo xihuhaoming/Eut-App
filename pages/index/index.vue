@@ -61,7 +61,7 @@
 			</up-dropdown>
 		</view>
 
-		<block v-for="(item,index) in listData.value">
+		<block v-if="listData" v-for="(item,index) in listData">
 			<view class="card-box u-flex up-m-t-30">
 				<view class="itemIcon" v-if="item.type==0">任务</view>
 				<view class="itemIcon" v-if="item.type==1">审批</view>
@@ -78,13 +78,14 @@
 						<view class="cardxt">金额：</view>
 						<view class="cardcon">{{item.formData.amount}}</view>
 						<view class="up-flex u-row-around up-m-t-30">
-							<view class="card-btnl">拒绝</view>
-							<view class="card-btnr">同意</view>
+							<view class="card-btnl" v-if="item.type==0">拒绝</view>
+							<view class="card-btnr" v-if="item.type==0">同意</view>
 						</view>
 					</view>
 				</view>
 			</view>
 		</block>
+		<up-empty v-else class="up-m-t-50" mode="list" icon="/static/ques.png"></up-empty>
 		<!-- 选择时间 -->
 		<up-datetime-picker :minDate="1735660800000" :hasInput="false" class="timeView" hasInput :show="timeshow1"
 			v-model="startTime" mode="date" placeholder="开始时间" @confirm="confirm1"
@@ -152,13 +153,14 @@
 	const workValue = reactive([])
 	const workValue2 = reactive([])
 	const uDropdownRef = ref(null)
-	const startTime = ref('2025-05-11 11:21:51')
-	const endTime = ref('2025-05-11 11:21:51')
+	const startTime = ref('开始时间')
+	const endTime = ref('结束时间')
 	const timeshow1 = ref(false);
 	const timeshow2 = ref(false);
 	const pageNum = ref(1)
-	const listData = reactive([])
+	const listData = ref([])
 	const ReadCountData = ref()
+	const typeValueData = ref()
 	onReady(() => {
 
 	})
@@ -175,7 +177,6 @@
 	const WorkGroupListFn = () => {
 		API_getWorkGroupList().then(res => {
 			console.log(res.data)
-
 			res.data.forEach((item, index) => {
 				// console.log(item)
 				item.label = item.categoryName
@@ -195,28 +196,36 @@
 	}
 	// 列表
 	const worklistData = () => {
-		let permission = workValue.join(',')
+		let workGroupId = workValue.join(',')
+		let noticeTypes = typeValue.join(',')
 		// console.log(startTime.value,endTime.value)
-		// if (startTime.value == '开始时间') {
-		// 	startTime.value = ""
-		// }
-		// if (endTime.value == '结束时间') {
-		// 	endTime.value = ""
-		// }
+		let startTimeData, endTimeData;
+		startTimeData = startTime.value
+		endTimeData = endTime.value
+		if (startTime.value == '开始时间') {
+			startTimeData = ""
+		}
+		if (endTime.value == '结束时间') {
+			endTimeData = ""
+		}
+
 		API_getListByType({
-			startTime: startTime.value,
-			endTime: endTime.value,
-			// workGroupId:permission,
-			type: typeValue[0]
+			startTime: startTimeData,
+			endTime: endTimeData,
+			workGroupId: workGroupId,
+			type: typeValueData.value,
+			noticeTypes: noticeTypes
 		}).then(res => {
 			listData.value = res.data
+			// listData.value.push(...res.data)
 			console.log(res)
-
 		})
 	}
 	// tab切换
 	const tabclick = (e) => {
-		console.log(e)
+		console.log(e.index)
+		typeValueData.value = e.index
+		worklistData();
 	}
 	// 消息跳转
 	const msgClick = () => {
@@ -384,7 +393,6 @@
 	}
 
 	.card-box {
-
 		padding: 35rpx;
 
 		.itemIcon {
@@ -409,7 +417,7 @@
 			padding: 35rpx;
 			box-shadow: 0rpx 6rpx 26rpx 1rpx rgba(138, 139, 143, 0.16);
 			border-radius: 10rpx;
-			// width: 480rpx;
+			width: 500rpx;
 
 			/* height:625rpx; */
 			.cardTitle {
