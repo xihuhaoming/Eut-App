@@ -35,7 +35,7 @@
 						<view class="updataLeft u-flex u-col-center">
 							<image src="/static/logo.png"></image>
 							<!-- <image :src="item.url"></image> -->
-							<view class="up-m-l-10 name">{{item.fileName}}</view>
+							<view class="up-m-l-10 name">{{item.name}}</view>
 						</view>
 						<up-icon @click="delefill(index)" name="close-circle-fill" size="22px" color="#B7C4D7"></up-icon>
 
@@ -89,18 +89,37 @@
 	const textValue = ref('')
 	const Submit = () => {
 		// console.log(from)
-		if(!title.value) return toast('请输入事项名称');
-		if(!endTime.value) return toast('请输入截止时间');
+		if (!title.value) return uni.$u.toast('请输入事项名称');
+		if (!endTime.value) return uni.$u.toast('请输入截止时间');
 		API_taskAdd({
-			type:typeValue.value,
-			endTime:endTime.value,
-			title:title.value,
-			content:content.value,
-			attachmentList:fillList.value,
-			receiveUser:{},
-			copyUser:{}
+			type: typeValue.value,
+			endTime: endTime.value,
+			title: title.value,
+			content: content.value,
+			attachmentList: fillList.value,
+			receiveUser: {
+				departList: [
+					"2020d4b7af34494540ac29b295ccd6a7",
+					"2438158ecf27f7693780a9f6b1014b0d"
+				],
+				userSysList: [
+					"20201104093740246601",
+					"20201104093507572009"
+				]
+			},
+			copyUser: {
+				departList: [
+					"2020d4b7af34494540ac29b295ccd6a7",
+					"2438158ecf27f7693780a9f6b1014b0d"
+				],
+				userSysList: [
+					"20201104093740246601",
+					"20201104093507572009"
+				]
+			}
 		}).then(res => {
 			console.log(res)
+			uni.navigateBack()
 		})
 	}
 	const delefill = (index) => {

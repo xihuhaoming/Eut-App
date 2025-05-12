@@ -249,10 +249,10 @@
 	const completedList = reactive([])
 	const issuedList = reactive([])
 	const copyList = reactive([])
-	onLoad(() => {
+	onMounted(() => {
 		tasklistData();
 	})
-
+	
 	// 列表
 	const tasklistData = () => {
 		let noticeTypes = typeValue.join(',')
@@ -367,6 +367,7 @@
 		box-shadow: 0rpx 6rpx 26rpx 1rpx rgba(138, 139, 143, 0.16);
 		border-radius: 10rpx;
 		padding: 30rpx;
+		margin-top:30rpx;
 
 		.titemTop {
 			border-bottom: 1rpx solid #F5F5F5;
@@ -403,7 +404,7 @@
 	.tianj {
 		width: 120rpx;
 		height: 120rpx;
-		position: absolute;
+		position: fixed;
 		right: 10rpx;
 		bottom: 15vh;
 	}

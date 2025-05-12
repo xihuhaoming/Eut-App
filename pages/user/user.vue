@@ -3,7 +3,7 @@
 		<view class="pagetitle">个人中心</view>
 		<view class="pagebox">
 			<view class="usercon up-p-t-40">
-				<image class="toux" src="/static/logo.png"></image>
+				<image class="toux" :src="absoluteUrl.value"></image>
 				<view class="name bold">{{info.name}}</view>
 				<view class="bum up-m-t-5 up-m-b-5">{{info.deptList[0].name}}</view>
 				<view class="phone">{{info.sysNo}}</view>
@@ -53,6 +53,7 @@
 	} from '/util/auth.js'
 	const store = useCounterStore();
 	console.log(store)
+	const absoluteUrl = ref('')
 	const info = store.userInfo;
 	const updata = () => {
 		uni.chooseImage({
@@ -70,16 +71,21 @@
 				// } else {
 				// uploadFilePromise(filList)
 				// console.log(uploadFileFn(filList))
-				let fill = uploadFileFn(filList)
-				console.log(fill)
-				changeAvatar({
-					string: fill.url
-				}).then(res => {
-					console.log(res);
-					if (res.code === 200) {
-						uni.$u.toast('上传成功')
-					}
+				uploadFileFn(filList).then(res => {
+					// console.log(res)
+					// absoluteUrl.value = res.absoluteUrl
+					changeAvatar({
+						string: res.url
+					}).then(res => {
+						console.log(res);
+						if (res.code === 200) {
+							uni.$u.toast('上传成功')
+						}
+					})
 				})
+				
+
+
 				// }
 			}
 		});
