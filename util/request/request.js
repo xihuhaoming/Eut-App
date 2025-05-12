@@ -99,3 +99,4 @@ export function get(url, params, resolveType, type = 'get') {
 		})
 	})
 };
+

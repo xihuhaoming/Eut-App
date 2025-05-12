@@ -12,23 +12,23 @@
 			</view>
 			<view class="card">
 				<up-cell-group :border="false">
-					<up-cell title="截止日期" value="2023.12.30 12:00" :isLink="true" arrow-direction="right"
-						:required="true"></up-cell>
+					<up-cell title="截止日期" :value="endTime" :isLink="true" arrow-direction="right" :required="true"
+						@click="timeTan(1)"></up-cell>
 					<up-cell title="事项名称" isLink :required="true">
 						<template #value>
-							<input v-model="name" placeholder="请输入事项名称" type="text"
+							<input v-model="title" placeholder="请输入事项名称" type="text"
 								style="text-align:right;color:#092D5C;font-size:26rpx;">
 						</template>
 					</up-cell>
 				</up-cell-group>
 				<view class="textClass up-m-t-20">
-					<textarea type="textarea" placeholder="请输入文字内容" border="surround" v-model="textValue"></textarea>
+					<textarea type="textarea" placeholder="请输入文字内容" border="surround" v-model="content"></textarea>
 				</view>
 				<view class="attachmentTitle u-flex up-m-t-30 u-row-between ">
 					<view class="attLeft">
 						附件：<text style="color: #B7C4D7;">请添加图片或文件</text>
 					</view>
-					<up-icon name="plus-circle" size="22px" color="#5A78A0"></up-icon>
+					<up-icon @click="uploadClick" name="plus-circle" size="22px" color="#5A78A0"></up-icon>
 				</view>
 				<view class="u-flex up-m-t-30 u-row-between ">
 					<view class="updataLeft u-flex u-col-center">
@@ -43,24 +43,33 @@
 			</view>
 			<view class="card">
 				<up-cell-group :border="false">
-					<up-cell title="任务人" value="已选 15 人" :isLink="true" arrow-direction="right"
-						:required="true"></up-cell>
-					<up-cell title="抄送人" value="已选 1 人" :isLink="true" arrow-direction="right"
-						:required="true"></up-cell>
+					<up-cell title="任务人" value="已选 15 人" :isLink="true" arrow-direction="right" :required="true"></up-cell>
+					<up-cell title="抄送人" value="已选 1 人" :isLink="true" arrow-direction="right" :required="true"></up-cell>
 				</up-cell-group>
 			</view>
 			<view class="qued up-m-t-70">确定</view>
 		</view>
+		<!-- 选择时间 -->
+		<up-datetime-picker :minDate="1735660800000" :hasInput="false" class="timeView" hasInput :show="timeshow1"
+			v-model="endTime" mode="date" placeholder="开始时间" @confirm="confirm1"
+			@cancel="timeshow1 = false"></up-datetime-picker>
 	</view>
 </template>
 
 <script setup>
+	import {
+		upload
+	} from "/util/request/request.js"
 	import {
 		ref,
 		reactive,
 		onMounted
 	} from 'vue';
 	const typeValue = ref(1)
+	const timeshow1 = ref(false)
+	const endTime = ref('请选择')
+	const title = ref('')
+	const content = ref('')
 	const typeList = reactive([{
 		label: '任务',
 		value: 1
@@ -70,9 +79,31 @@
 	}]);
 	const name = ref('')
 	const textValue = ref('')
+	// 上传
+	const uploadClick = () => {
+		upload().then(res=>{
+			console.log(res)
+		})
+	}
 	// 选择类型Z
 	const itemClick = (e) => {
 		console.log(e)
+	}
+	// 选择时间
+	const timeTan = (e) => {
+		timeshow1.value = true
+	}
+	const confirm1 = (e) => {
+		endTime.value = formatTimestamp(e.value)
+		timeshow1.value = false;
+	}
+	// 转换时间戳
+	const formatTimestamp = (timestamp) => {
+		const date = new Date(timestamp);
+		const year = date.getFullYear();
+		const month = String(date.getMonth() + 1).padStart(2, '0');
+		const day = String(date.getDate()).padStart(2, '0');
+		return `${year}-${month}-${day}`;
 	}
 </script>
 

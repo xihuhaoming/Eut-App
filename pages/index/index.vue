@@ -165,11 +165,13 @@
 
 	})
 	// 初始化
-	onMounted(() => {})
-	onLoad(() => {
+	onMounted(() => {
 		worklistData();
 		noticeData();
 		WorkGroupListFn();
+	})
+	onLoad(() => {
+
 	})
 	onReachBottom(() => {
 		console.log("触底")
