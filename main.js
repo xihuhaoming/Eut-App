@@ -1,6 +1,7 @@
 import App from './App'
 
 
+
 // import appApi from './api/index';
 import uviewPlus from '@/uni_modules/uview-plus'
 import '/util/request/http.interceptor.js'
@@ -30,11 +31,13 @@ uni.$u.setConfig({
 import {
 	createSSRApp
 } from 'vue'
-import { createPinia } from 'pinia'
+import {
+	createPinia
+} from 'pinia'
 
 export function createApp() {
 	const app = createSSRApp(App)
-	
+
 	// 实例化pina
 	const pinia = createPinia()
 	console.log(pinia)

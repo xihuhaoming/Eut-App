@@ -63,7 +63,7 @@
 			</view>
 		</view>
 		<view class="taskbox" v-if="typeIndex==0">
-			<block v-if="todoList.value!=null">
+			<block v-if="todoList.value.length">
 				<view class="taskItem" v-for="(item,index) in todoList.value" :key="index">
 					<view class="titemTop u-flex u-row-between up-p-b-15">
 						<view class="ttleft u-flex u-col-center">
@@ -88,7 +88,7 @@
 		</view>
 
 		<view class="taskbox" v-if="typeIndex==1">
-			<block v-if="completedList.value!=null">
+			<block v-if="completedList.value.length">
 				<view class="taskItem" v-for="(item,index) in completedList.value" :key="index">
 					<view class="titemTop u-flex u-row-between up-p-b-15">
 						<view class="ttleft u-flex u-col-center">
@@ -112,7 +112,7 @@
 			<up-empty v-else class="up-m-t-50" mode="list" icon="/static/ques.png"></up-empty>
 		</view>
 		<view class="taskbox" v-if="typeIndex==2">
-			<block v-if="issuedList.value!=null">
+			<block v-if="issuedList.value.length">
 				<view class="taskItem" v-for="(item,index) in issuedList.value" :key="index">
 					<view class="titemTop u-flex u-row-between up-p-b-15">
 						<view class="ttleft u-flex u-col-center">
@@ -135,7 +135,7 @@
 			<up-empty v-else class="up-m-t-50" mode="list" icon="/static/ques.png"></up-empty>
 		</view>
 		<view class="taskbox" v-if="typeIndex==3">
-			<block v-if="copyList.value!=null">
+			<block v-if="copyList.value.length">
 				<view class="taskItem" v-for="(item,index) in copyList.value" :key="index">
 					<view class="titemTop u-flex u-row-between up-p-b-15">
 						<view class="ttleft u-flex u-col-center">
@@ -234,7 +234,7 @@
 			value: 3
 		}
 	]);
-	const typeIndex = ref('0')
+	const typeIndex = ref(0)
 	const typeValue = reactive([])
 	const workValue = reactive([])
 	const workValue2 = reactive([])
@@ -254,7 +254,7 @@
 	})
 
 	// 列表
-	const tasklistData = (type) => {
+	const tasklistData = () => {
 		let noticeTypes = typeValue.join(',')
 		let startTimeData, endTimeData;
 		startTimeData = startTime.value
@@ -266,7 +266,7 @@
 			endTimeData = ""
 		}
 		API_taskList({
-			type: type,
+			type: typeIndex.value,
 			startTime: startTimeData,
 			endTime: endTimeData,
 			noticeTypes: noticeTypes,
@@ -293,7 +293,7 @@
 	const tabclick = (e) => {
 		console.log(e)
 		typeIndex.value = e.index
-		tasklistData(e.index)
+		tasklistData()
 	}
 
 	// 关闭筛选框

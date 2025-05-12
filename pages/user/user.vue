@@ -4,9 +4,9 @@
 		<view class="pagebox">
 			<view class="usercon up-p-t-40">
 				<image class="toux" src="/static/logo.png"></image>
-				<view class="name bold">易尤特</view>
-				<view class="bum up-m-t-5 up-m-b-5">所属部门的名字</view>
-				<view class="phone">18538572021</view>
+				<view class="name bold">{{info.name}}</view>
+				<view class="bum up-m-t-5 up-m-b-5">{{info.deptList[0].name}}</view>
+				<view class="phone">{{info.sysNo}}</view>
 				<view class="bianj up-flex u-col-center">
 					<image src="/static/user/xiug.png"></image>
 					<view @click="updata">编辑</view>
@@ -30,6 +30,9 @@
 
 <script setup>
 	import {
+		uploadFileFn
+	} from '/util/request/request';
+	import {
 		userLogout,
 		changeAvatar
 	} from '/api/user.js'
@@ -43,13 +46,14 @@
 	} from 'vue';
 	import {
 		useCounterStore
-	} from '../../store/counter';
+	} from '/store/counter';
 	import {
 		setToken,
 		getToken
 	} from '/util/auth.js'
 	const store = useCounterStore();
-	const UPLOADURL = store.UPLOADURL;
+	console.log(store)
+	const info = store.userInfo;
 	const updata = () => {
 		uni.chooseImage({
 			count: 1, //默认9
@@ -64,42 +68,53 @@
 				// if (size > 512) {
 				// 	uni.$u.toast('头像大小不能超过512kb，请重新上传');
 				// } else {
-				uploadFilePromise(filList)
+				// uploadFilePromise(filList)
+				// console.log(uploadFileFn(filList))
+				let fill = uploadFileFn(filList)
+				console.log(fill)
+				changeAvatar({
+					string: fill.url
+				}).then(res => {
+					console.log(res);
+					if (res.code === 200) {
+						uni.$u.toast('上传成功')
+					}
+				})
 				// }
 			}
 		});
 	}
-	const uploadFilePromise = (url) => {
+	// const uploadFilePromise = (url) => {
 
-		return new Promise((resolve, reject) => {
-			let a = uni.uploadFile({
-				url: UPLOADURL, // 仅为示例，非真实的接口地址
-				filePath: url,
-				name: 'file',
-				header: {
-					Authorization: getToken(),
-				},
-				success: (res) => {
-					const d = JSON.parse(res.data)
-					console.log(d)
-					if (d.code === 200) {
-						changeAvatar({
-							string: d.data.url
-						}).then(res => {
-							console.log(res);
-							if (res.code === 200) {
-								// this.$refreshUserInfo();
-								uni.$u.toast('上传成功')
-							}
-						})
-					} else {
-						reject('上传失败')
-						uni.$u.toast(d.msg)
-					}
-				},
-			});
-		});
-	}
+	// 	return new Promise((resolve, reject) => {
+	// 		let a = uni.uploadFile({
+	// 			url: UPLOADURL, // 仅为示例，非真实的接口地址
+	// 			filePath: url,
+	// 			name: 'file',
+	// 			header: {
+	// 				Authorization: getToken(),
+	// 			},
+	// 			success: (res) => {
+	// 				const d = JSON.parse(res.data)
+	// 				console.log(d)
+	// 				if (d.code === 200) {
+	// 					changeAvatar({
+	// 						string: d.data.url
+	// 					}).then(res => {
+	// 						console.log(res);
+	// 						if (res.code === 200) {
+	// 							// this.$refreshUserInfo();
+	// 							uni.$u.toast('上传成功')
+	// 						}
+	// 					})
+	// 				} else {
+	// 					reject('上传失败')
+	// 					uni.$u.toast(d.msg)
+	// 				}
+	// 			},
+	// 		});
+	// 	});
+	// }
 	const logouttap = () => {
 		uni.showModal({
 			title: '提示：',

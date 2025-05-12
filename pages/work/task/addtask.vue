@@ -30,13 +30,17 @@
 					</view>
 					<up-icon @click="uploadClick" name="plus-circle" size="22px" color="#5A78A0"></up-icon>
 				</view>
-				<view class="u-flex up-m-t-30 u-row-between ">
-					<view class="updataLeft u-flex u-col-center">
-						<image src="/static/logo.png"></image>
-						<view class="up-m-l-10 name">文件名称</view>
+				<block v-for="(item,index) in fillList" :key="index">
+					<view class="u-flex up-m-t-30 u-row-between ">
+						<view class="updataLeft u-flex u-col-center">
+							<image src="/static/logo.png"></image>
+							<!-- <image :src="item.url"></image> -->
+							<view class="up-m-l-10 name">{{item.fileName}}</view>
+						</view>
+						<up-icon @click="delefill(index)" name="close-circle-fill" size="22px" color="#B7C4D7"></up-icon>
+
 					</view>
-					<up-icon name="close-circle-fill" size="22px" color="#B7C4D7"></up-icon>
-				</view>
+				</block>
 			</view>
 			<view class="xtitle bold">
 				流程
@@ -47,7 +51,7 @@
 					<up-cell title="抄送人" value="已选 1 人" :isLink="true" arrow-direction="right" :required="true"></up-cell>
 				</up-cell-group>
 			</view>
-			<view class="qued up-m-t-70">确定</view>
+			<view class="qued up-m-t-70" @click="Submit">确定</view>
 		</view>
 		<!-- 选择时间 -->
 		<up-datetime-picker :minDate="1735660800000" :hasInput="false" class="timeView" hasInput :show="timeshow1"
@@ -58,13 +62,17 @@
 
 <script setup>
 	import {
-		upload
-	} from "/util/request/request.js"
+		API_taskAdd
+	} from '../../../api/task.js'
+	import {
+		uploadFileFn
+	} from '/util/request/request';
 	import {
 		ref,
 		reactive,
 		onMounted
 	} from 'vue';
+	const fillList = ref([])
 	const typeValue = ref(1)
 	const timeshow1 = ref(false)
 	const endTime = ref('请选择')
@@ -72,18 +80,53 @@
 	const content = ref('')
 	const typeList = reactive([{
 		label: '任务',
-		value: 1
+		value: 0
 	}, {
 		label: '通知',
-		value: 2
+		value: 1
 	}]);
 	const name = ref('')
 	const textValue = ref('')
-	// 上传
-	const uploadClick = () => {
-		upload().then(res=>{
+	const Submit = () => {
+		// console.log(from)
+		if(!title.value) return toast('请输入事项名称');
+		if(!endTime.value) return toast('请输入截止时间');
+		API_taskAdd({
+			type:typeValue.value,
+			endTime:endTime.value,
+			title:title.value,
+			content:content.value,
+			attachmentList:fillList.value,
+			receiveUser:{},
+			copyUser:{}
+		}).then(res => {
 			console.log(res)
 		})
+	}
+	const delefill = (index) => {
+		fillList.value.splice(index, 1)
+	}
+	// 上传
+	const uploadClick = () => {
+		uni.chooseFile({
+			count: 1, // 最多选择 1 个文件
+			type: 'all', // 选择所有类型的文件
+			success: function(res) {
+				console.log(res)
+				console.log('选择的文件路径：', res.tempFiles[0].path);
+				let fillPath = res.tempFilePaths[0];
+				console.log(fillList.value)
+				uploadFileFn(fillPath).then(res => {
+					console.log(res)
+					fillList.value.push(res)
+				})
+			},
+			fail: function(err) {
+				console.error('选择文件失败：', err);
+			}
+			// fillList.value.push(...obj)
+		});
+
 	}
 	// 选择类型Z
 	const itemClick = (e) => {

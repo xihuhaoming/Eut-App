@@ -7,6 +7,10 @@ import {
 	http,
 	toast
 } from '@/uni_modules/uview-plus'
+import {
+	setToken,
+	getToken
+} from '/util/auth.js'
 // 1.检查网络是否可用
 function isNetworkError() {
 	return new Promise(resolve => {
@@ -100,3 +104,25 @@ export function get(url, params, resolveType, type = 'get') {
 	})
 };
 
+export function uploadFileFn(filePath) {
+	return new Promise((resolve, reject) => {
+		uni.uploadFile({
+			url: `${APIURL}/common/upload`, // 仅为示例，非真实的接口地址
+			filePath: filePath,
+			name: 'file',
+			header: {
+				Authorization: getToken(),
+			},
+			success: (res) => {
+				const d = JSON.parse(res.data)
+				console.log(res)
+				if (d.code === 200) {
+					resolve(d.data)
+				} else {
+					reject('上传失败')
+					uni.$u.toast(d.msg)
+				}
+			},
+		});
+	});
+};

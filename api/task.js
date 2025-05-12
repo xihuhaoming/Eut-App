@@ -5,11 +5,9 @@ import {
 
 // 获取任务通知列表
 export function API_taskList(params) {
-	return get('/task/list', {
-		params
-	})
+	return get('/task/list', {params})
 }
-// 修改密码
-export function changePwd(params) {
-	return post('/user/changePwd', params)
+// 新增任务
+export function API_taskAdd(params) {
+	return post('/task/add', params)
 }
