@@ -3,7 +3,7 @@
 		<view class="pagetitle">个人中心</view>
 		<view class="pagebox">
 			<view class="usercon up-p-t-40">
-				<!-- <image class="toux" :src="store.userInfo.avatar"></image> -->
+				<image class="toux" :src="store.userInfo.avatar"></image>
 				<view class="name bold">{{store.userInfo.name}}</view>
 				<view class="bum up-m-t-5 up-m-b-5">{{store.userInfo.deptList[0].name}}</view>
 				<view class="phone">{{store.userInfo.sysNo}}</view>
@@ -54,7 +54,7 @@
 	} from '/util/auth.js'
 	const absoluteUrl = ref('')
 	// const info = store.userInfo;
-	// console.log(info)
+	console.log(store.userInfo.avatar)
 	const updata = () => {
 		uni.chooseImage({
 			count: 1, //默认9
@@ -73,7 +73,10 @@
 				// console.log(uploadFileFn(filList))
 				uploadFileFn(filList).then(res => {
 					// console.log(res)
-					// absoluteUrl.value = res.absoluteUrl
+					let obj = store.userInfo;
+					obj.avatar = res.absoluteUrl;
+					
+					store.setUserinfo(obj)
 					changeAvatar({
 						string: res.url
 					}).then(res => {

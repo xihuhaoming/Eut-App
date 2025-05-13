@@ -62,7 +62,7 @@
 			</view>
 		</view>
 		<view class="taskbox">
-			<view class="taskItem">
+			<view class="taskItem up-m-t-30">
 				<view class="u-flex u-row-between">
 					<view class="itleft">人员名称</view>
 					<view class="itleft2">退回</view>
@@ -72,7 +72,7 @@
 					<view class="itright2">查看</view>
 				</view>
 			</view>
-			<view class="taskItem">
+			<view class="taskItem up-m-t-30">
 				<view class="u-flex u-row-between">
 					<view class="itleft">人员名称</view>
 					<view class="itleft2">退回</view>
@@ -80,7 +80,7 @@
 					<view class="itright2">查看</view>
 				</view>
 			</view>
-			<view class="taskItem">
+			<view class="taskItem up-m-t-30">
 				<view class="u-flex u-row-between">
 					<view class="itleft">人员名称</view>
 					<view class="itleft2">退回</view>

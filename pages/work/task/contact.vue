@@ -39,6 +39,12 @@
 
 <script setup>
 	import {
+		userGetDepartList
+	} from '/api/user.js'
+	import {
+		onLoad
+	} from '@dcloudio/uni-app'
+	import {
 		ref,
 		reactive
 	} from 'vue';
@@ -59,7 +65,20 @@
 			disabled: false,
 		},
 	]);
-
+	import {
+		useCounterStore
+	} from '/store/counter';
+	const store = useCounterStore();
+	onLoad(() => {
+		DepartList()
+	})
+	const DepartList = () => {
+		userGetDepartList({
+			departSysNo:store.userInfo.sysNo
+		}).then(res => {
+			console.log(res)
+		})
+	}
 	const checkboxChange = (n) => {
 		console.log('change', n);
 	};
@@ -69,25 +88,29 @@
 	page {
 		background: #F6F8FA;
 	}
-	.botFixd{
-		width:100%;
-		padding:50rpx 30rpx;
-		background:#fff;
-		position:absolute;
-		bottom:0;
-		.lefttext{
-			font-size:28rpx;
-			color:#092D5C;
+
+	.botFixd {
+		width: 100%;
+		padding: 50rpx 30rpx;
+		background: #fff;
+		position: absolute;
+		bottom: 0;
+
+		.lefttext {
+			font-size: 28rpx;
+			color: #092D5C;
 		}
-		.btn{
+
+		.btn {
 			background: #3C82FE;
-			box-shadow: 0px 8px 20px 0px rgba(60,130,254,0.3);
+			box-shadow: 0px 8px 20px 0px rgba(60, 130, 254, 0.3);
 			border-radius: 49px;
-			padding:15rpx 60rpx;
-			color:#fff;
-			font-size:28rpx;
+			padding: 15rpx 60rpx;
+			color: #fff;
+			font-size: 28rpx;
 		}
 	}
+
 	.card {
 		padding: 30rpx;
 

@@ -29,3 +29,32 @@ export function API_taskStop(params) {
 export function API_taskEdit(params) {
 	return post('/task/edit', params)
 }
+// 审核
+export function API_taskReplyAudit(params) {
+	return post('/taskReply/audit', params)
+}
+// 任务回复详情
+export function API_taskReplyDetail(params) {
+	return get('/taskReply/detail/' + params)
+}
+// 任务回复列表
+export function API_taskReplyList(params) {
+	return get('/taskReply/list',{params})
+}
+// 提交
+export function API_taskReplySubmit(params) {
+	return post('/taskReply/submit', params)
+}
+// 完成
+export function API_taskReplyComplete(params) {
+	return post('/taskReply/complete/' + params)
+}
+
+// 选择合同
+export function API_getUnionContractList(params) {
+	return get('/contract/getUnionContractList', {params})
+}
+// 合同
+export function API_invoiceApplyAdd(params) {
+	return post('/invoiceApply/add', params)
+}

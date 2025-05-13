@@ -63,17 +63,17 @@
 			</view>
 		</view>
 		<view class="taskbox" v-if="typeIndex==0">
-			<block v-if="todoList.value.length">
-				<view class="taskItem" v-for="(item,index) in todoList.value" :key="index">
+			<block v-if="todoList.value?.length">
+				<view class="taskItem" v-for="(item,index) in todoList.value" :key="index" @click="detileTap(item)">
 					<view class="titemTop u-flex u-row-between up-p-b-15">
 						<view class="ttleft u-flex u-col-center">
 							<image src="/static/work/time.png"></image>
 							<view>{{item.createInDate}}</view>
 						</view>
-						<view class="ttright" v-if="item.status==0">待确认</view>
-						<view class="ttright" v-if="item.status==1">确认中</view>
-						<view class="ttright" v-if="item.status==2">已完成</view>
-						<view class="ttright" v-if="item.status==3">已驳回</view>
+						<view class="ttright" v-if="item.taskReplyStatus==0">待确认</view>
+						<view class="ttright" v-if="item.taskReplyStatus==1">确认中</view>
+						<view class="ttright" v-if="item.taskReplyStatus==2">已完成</view>
+						<view class="ttright" v-if="item.taskReplyStatus==3" style="color:#FE4949">已驳回</view>
 					</view>
 					<view class="task-title up-m-t-20 bold">
 						{{item.title}}
@@ -88,17 +88,17 @@
 		</view>
 
 		<view class="taskbox" v-if="typeIndex==1">
-			<block v-if="completedList.value.length">
-				<view class="taskItem" v-for="(item,index) in completedList.value" :key="index">
+			<block v-if="completedList.value?.length">
+				<view class="taskItem" v-for="(item,index) in completedList.value" :key="index" @click="detileTap(item)">
 					<view class="titemTop u-flex u-row-between up-p-b-15">
 						<view class="ttleft u-flex u-col-center">
 							<image src="/static/work/time.png"></image>
 							<view>{{item.createInDate}}</view>
 						</view>
-						<view class="ttright" v-if="item.status==0">待确认</view>
-						<view class="ttright" v-if="item.status==1">确认中</view>
-						<view class="ttright" v-if="item.status==2">已完成</view>
-						<view class="ttright" v-if="item.status==3">已驳回</view>
+						<view class="ttright" v-if="item.taskReplyStatus==0">待确认</view>
+						<view class="ttright" v-if="item.taskReplyStatus==1">确认中</view>
+						<view class="ttright" v-if="item.taskReplyStatus==2">已完成</view>
+						<view class="ttright" v-if="item.taskReplyStatus==3">已驳回</view>
 					</view>
 					<view class="task-title up-m-t-20 bold">
 						{{item.title}}
@@ -112,7 +112,7 @@
 			<up-empty v-else class="up-m-t-50" mode="list" icon="/static/ques.png"></up-empty>
 		</view>
 		<view class="taskbox" v-if="typeIndex==2">
-			<block v-if="issuedList.value.length">
+			<block v-if="issuedList.value?.length">
 				<view class="taskItem" v-for="(item,index) in issuedList.value" :key="index" @click="detileTap(item)">
 					<view class="titemTop u-flex u-row-between up-p-b-15">
 						<view class="ttleft u-flex u-col-center">
@@ -138,7 +138,7 @@
 			<up-empty v-else class="up-m-t-50" mode="list" icon="/static/ques.png"></up-empty>
 		</view>
 		<view class="taskbox" v-if="typeIndex==3">
-			<block v-if="copyList.value.length">
+			<block v-if="copyList.value?.length ">
 				<view class="taskItem" v-for="(item,index) in copyList.value" :key="index" @click="detileTap(item)">
 					<view class="titemTop u-flex u-row-between up-p-b-15">
 						<view class="ttleft u-flex u-col-center">
@@ -299,6 +299,11 @@
 	// 详情
 	const detileTap = (item) => {
 		console.log(item)
+		if (typeIndex.value == 0 || typeIndex.value == 1) {
+			uni.navigateTo({
+				url: `/pages/work/task/taskDetile1?taskReplyId=${item.taskReplyId}&id=${item.id}`
+			})
+		}
 		if (typeIndex.value == 2 || typeIndex.value == 3) {
 			uni.navigateTo({
 				url: `/pages/work/task/taskDetile2?typeIndex=${typeIndex.value}&id=${item.id}`

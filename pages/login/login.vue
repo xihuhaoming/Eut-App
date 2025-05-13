@@ -48,8 +48,8 @@
 		getToken
 	} from '/util/auth.js'
 	const store = useCounterStore();
-	const name = ref('13758340229')
-	// const name = ref('13385831395')
+	// const name = ref('13758340229')
+	const name = ref('13385831395')
 	const password = ref('123456')
 	const psdshow = ref(true)
 	const logloading = ref(false)
@@ -87,7 +87,7 @@
 				uni.switchTab({
 					url: '/pages/index/index'
 				})
-				uni.$u.hideLoding();
+				uni.hideLoding();
 			}
 		})
 

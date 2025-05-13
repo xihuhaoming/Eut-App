@@ -40,12 +40,22 @@ export function post(url, params, resolveType, type = 'post') {
 			} else if (data.code == 401) {
 				uni.hideLoading()
 				// reject('请重新登录');
-				toast('请重新登录')
-				setTimeout(() => {
-					uni.navigateTo({
-						url: '/pages/login/login'
-					})
-				}, 1000)
+				// toast('请重新登录')
+				uni.showModal({
+					title: '提示',
+					content: '请重新登录',
+					showCancel: false,
+					success: function(res) {
+						if (res.confirm) {
+							setTimeout(() => {
+								uni.navigateTo({
+									url: '/pages/login/login'
+								})
+							}, 1000)
+						}
+					}
+				});
+
 			} else {
 				uni.hideLoading()
 				toast('网络错误')
@@ -79,12 +89,20 @@ export function get(url, params, resolveType, type = 'get') {
 			} else if (data.code == 401) {
 				uni.hideLoading()
 				reject('请重新登录');
-				toast('请重新登录')
-				setTimeout(() => {
-					uni.navigateTo({
-						url: '/pages/login/login'
-					})
-				}, 1000)
+				uni.showModal({
+					title: '提示',
+					content: '请重新登录',
+					showCancel: false,
+					success: function(res) {
+						if (res.confirm) {
+							setTimeout(() => {
+								uni.navigateTo({
+									url: '/pages/login/login'
+								})
+							}, 1000)
+						}
+					}
+				});
 			} else {
 				uni.hideLoading()
 				toast('网络错误')
@@ -107,7 +125,8 @@ export function get(url, params, resolveType, type = 'get') {
 export function uploadFileFn(filePath) {
 	return new Promise((resolve, reject) => {
 		uni.uploadFile({
-			url: `${APIURL}/common/upload`, // 仅为示例，非真实的接口地址
+			url: `${APIURL}/common/upload`, 
+			// url: `https://erp.eut.prd4.weiniaokeji.cn/front/common/upload`,
 			filePath: filePath,
 			name: 'file',
 			header: {

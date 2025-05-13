@@ -4,54 +4,103 @@
 		<view class="const">
 			<view class="detileItem">
 				<view class="itemTime up-flex u-col-center">
-					<view class="timeLeft up-m-r-10">通知</view>
-					<view class="timeright">2023.03.05截止</view>
+					<view class="timeLeft up-m-r-10" v-if="data.taskDetail.type==1">通知</view>
+					<view class="timeLeft up-m-r-10" v-if="data.taskDetail.type==0">任务</view>
+					<view class="timeright">{{data.taskDetail.endTime}}截止</view>
 				</view>
 				<view class="up-flex u-col-center up-m-t-15">
 					<image src="/static/logo.png" class="infoLeft up-m-r-10">通知</image>
-					<view class="inforight">下发人名字：2023.03.05 16:00 下发</view>
+					<view class="inforight">{{data.userInfo.name}}：{{data.taskDetail.createInDate}}下发</view>
 				</view>
-				<view class="rwname bold up-m-t-20 up-m-b-20">任务事项名称</view>
+				<view class="rwname bold up-m-t-20 up-m-b-20">{{data.taskDetail.title}}</view>
 				<view class="rwcon">
-					如怀疑存在 DNS 劫持，可尝试更换 DNS 服务器或使用其他域名解析服务进行测试，以确定是否是 DNS 方面的问题
+					{{data.taskDetail.content}}
 				</view>
-				<view class="rightIcon" style="background: #FEAC49;">待处理</view>
+				<view class="rightIcon" style="background: #FEAC49;" v-if="data.taskDetail.status == 0">待处理</view>
+				<view class="rightIcon" style="background: #3C82FE;" v-if="data.taskDetail.status == 1">处理中</view>
+				<view class="rightIcon" style="background: #1CAA42;" v-if="data.taskDetail.status == 2">已处理</view>
+				<view class="rightIcon" style="background: #FE4949;" v-if="data.taskDetail.status == 3">已驳回</view>
 			</view>
-			<view class="xtitle bold">提交记录</view>
-			<view class="detileItem">
-				<view class="itemTime up-flex u-col-center">
-					<view class="timeLeft up-m-r-10">通知</view>
-					<view class="timeright">2023.03.05截止</view>
-				</view>
-				<view class="up-flex u-col-center up-m-t-15">
-					<image src="/static/logo.png" class="infoLeft up-m-r-10">通知</image>
-					<view class="inforight">下发人名字：2023.03.05 16:00 下发</view>
-				</view>
-				<view class="rwname bold up-m-t-20 up-m-b-20">任务事项名称</view>
-				<view class="rwcon">
-					如怀疑存在 DNS 劫持，可尝试更换 DNS 服务器或使用其他域名解析服务进行测试，以确定是否是 DNS 方面的问题
-				</view>
-				<view class="updateImg up-flex u-flex-wrap">
-					<image src="/static/logo.png" class="up-m-l-20 up-m-t-20"></image>
-					<image src="/static/logo.png" class="up-m-l-20 up-m-t-20"></image>
-					<image src="/static/logo.png" class="up-m-l-20 up-m-t-20"></image>
-					<image src="/static/logo.png" class="up-m-l-20 up-m-t-20"></image>
-				</view>
-				<!-- <view class="rightIcon" style="background: #FEAC49;">待处理</view> -->
-				<!-- <view class="rightIcon" style="background: #FE4949;">驳回</view> -->
-				<!-- <view class="rightIcon" style="background: #3C82FE;">待确认</view> -->
-				<view class="rightIcon" style="background: #1CAA42;">已通过</view>
-			</view>
+			<block v-if="data.submitList?.length">
+				<view class="xtitle bold">提交记录</view>
+				<block v-for="(item,index) in data.submitList" :key="index">
+					<view class="detileItem">
+						<view class="itemTime up-flex u-col-center">
+							<view class="timeLeft up-m-r-10" v-if="data.taskDetail.type==1">通知</view>
+							<view class="timeLeft up-m-r-10" v-if="data.taskDetail.type==0">任务</view>
+							<view class="timeright">{{data.taskDetail.endTime}}截止</view>
+						</view>
+						<view class="up-flex u-col-center up-m-t-15">
+							<image src="/static/logo.png" class="infoLeft up-m-r-10">通知</image>
+							<view class="inforight">{{data.taskDetail.title}}：{{item.replyTime}} 下发</view>
+						</view>
+						<view class="rwname bold up-m-t-20 up-m-b-20">{{item.title}}</view>
+						<view class="rwcon">
+							{{item.content}}
+						</view>
+						<view class="updateImg up-flex u-flex-wrap">
+							<block v-for="(item,index) in item.attachmentList">
+								<image src="/static/fillImg.png" class="up-m-l-20 up-m-t-20"></image>
+							</block>
+						</view>
+						<!-- <view class="rightIcon" style="background: #FEAC49;">待处理</view> -->
+						<!-- <view class="rightIcon" style="background: #FE4949;">驳回</view> -->
+						<!-- <view class="rightIcon" style="background: #3C82FE;">待确认</view> -->
+						<view class="rightIcon" style="background: #1CAA42;">已通过</view>
+					</view>
+				</block>
+			</block>
+			<view class="qued btn" style="position:absolute;bottom:50rpx;" @click="submitTap">完成</view>
 		</view>
 	</view>
 </template>
 
 <script setup>
 	import {
+		API_taskReplyDetail,
+		API_taskReplyComplete
+	} from "../../../api/task.js"
+	import {
 		ref,
 		reactive,
 		onMounted
 	} from 'vue';
+	import {
+		onLoad
+	} from '@dcloudio/uni-app'
+	const data = ref()
+	const taskReplyId = ref()
+	const taskId = ref()
+	onLoad((e) => {
+		console.log(e)
+		// typeIndex.value = e.typeIndex
+		taskReplyId.value = e.taskReplyId
+		taskId.value = e.id
+		detileData();
+	})
+	const detileData = () => {
+		API_taskReplyDetail(taskReplyId.value).then(res => {
+			console.log(res)
+			data.value = res.data
+		})
+	}
+	const submitTap = () => {
+		console.log("0000", )
+		if (data.value.taskDetail.type == 1) {
+			// let taskReplyId = taskReplyId.value
+			API_taskReplyComplete(
+				taskReplyId.value
+			).then(res => {
+				uni.$u.toast('成功')
+				uni.navigateBack()
+			})
+		} else {
+			console.log("11111", )
+			uni.navigateTo({
+				url: '/pages/work/task/tdAdd?taskId=' + taskId.value
+			})
+		}
+	}
 </script>
 
 

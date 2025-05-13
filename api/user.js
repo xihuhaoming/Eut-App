@@ -40,3 +40,16 @@ export function noticeUnReadCount(params) {
 		params
 	})
 }
+
+// 通讯录 部门列表
+export function userGetDepartList(params) {
+	return get('/user/getDepartList', {
+		params
+	})
+}
+// 通讯录 用户列表
+export function userGetUserList(params) {
+	return get('/user/getUserList', {
+		params
+	})
+}

@@ -18,7 +18,10 @@ export const useCounterStore = defineStore('counter', {
 	// state: () => ({ count: 0 })
 	actions: {
 		setUserinfo(e) {
-			this.userInfo = e;
-		}
+			console.log("修改pina")
+			if (e) {
+				this.userInfo = e;
+			}
+		},
 	},
 })

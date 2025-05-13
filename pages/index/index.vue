@@ -110,7 +110,8 @@
 	import {
 		onReachBottom,
 		onLoad,
-		onReady
+		onReady,
+		onShow
 	} from "@dcloudio/uni-app"
 	import {
 		ref,
@@ -165,7 +166,7 @@
 
 	})
 	// 初始化
-	onMounted(() => {
+	onShow(() => {
 		worklistData();
 		noticeData();
 		WorkGroupListFn();

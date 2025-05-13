@@ -4,19 +4,21 @@
 		<view class="const">
 			<view class="detileItem">
 				<view class="itemTime up-flex u-col-center">
-					<view class="timeLeft up-m-r-10">通知</view>
+					<view class="timeLeft up-m-r-10" v-if="data.taskInfo.type==1">通知</view>
+					<view class="timeLeft up-m-r-10" v-if="data.taskInfo.type==0">任务</view>
 					<view class="timeright">{{data.taskInfo.endTime}}截止</view>
 				</view>
 				<view class="up-flex u-col-center up-m-t-15">
 					<image :src="data.userInfo.avatar" class="infoLeft up-m-r-10">通知</image>
-					<view class="inforight">{{data.userInfo.name}}：{{data.taskInfo.endTime}}下发</view>
+					<view class="inforight">{{data.userInfo.name}}：{{data.taskInfo.createInDate}}下发</view>
 				</view>
 				<view class="up-flex up-m-t-10 up-m-b-10 u-col-center">
 					<view class="wancLeft up-m-r-10">完成进度</view>
 					<u-line-progress :percentage="(data.completedCount/data.totalCount)
 					*100" activeColor="#19be6b"></u-line-progress>
 				</view>
-				<view class="wancLeft up-m-r-10">完成情况：{{data.completedCount}}/{{data.totalCount}} ></view>
+				<view class="wancLeft up-m-r-10" @click="CompletionTap()">完成情况：{{data.completedCount}}/{{data.totalCount}} >
+				</view>
 				<view class="rwname bold up-m-t-20 up-m-b-20">{{data.title}}</view>
 				<view class="rwcon">
 					{{data.content}}
@@ -68,6 +70,11 @@
 		taskId.value = e.id
 		detileData();
 	})
+	const CompletionTap = () => {
+		uni.navigateTo({
+			url:'/pages/work/task/Completion'
+		})
+	}
 	const detileData = () => {
 		console.log(taskId.value)
 		// return
