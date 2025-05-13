@@ -5,32 +5,35 @@
 			<view class="detileItem">
 				<view class="itemTime up-flex u-col-center">
 					<view class="timeLeft up-m-r-10">通知</view>
-					<view class="timeright">2023.03.05截止</view>
+					<view class="timeright">{{data.taskInfo.endTime}}截止</view>
 				</view>
 				<view class="up-flex u-col-center up-m-t-15">
-					<image src="/static/logo.png" class="infoLeft up-m-r-10">通知</image>
-					<view class="inforight">下发人名字：2023.03.05 16:00 下发</view>
+					<image :src="data.userInfo.avatar" class="infoLeft up-m-r-10">通知</image>
+					<view class="inforight">{{data.userInfo.name}}：{{data.taskInfo.endTime}}下发</view>
 				</view>
 				<view class="up-flex up-m-t-10 up-m-b-10 u-col-center">
 					<view class="wancLeft up-m-r-10">完成进度</view>
-					<u-line-progress :percentage="30" activeColor="#19be6b"></u-line-progress>
+					<u-line-progress :percentage="(data.completedCount/data.totalCount)
+					*100" activeColor="#19be6b"></u-line-progress>
 				</view>
-				<view class="wancLeft up-m-r-10">完成情况：30/100 ></view>
-				<view class="rwname bold up-m-t-20 up-m-b-20">任务事项名称</view>
+				<view class="wancLeft up-m-r-10">完成情况：{{data.completedCount}}/{{data.totalCount}} ></view>
+				<view class="rwname bold up-m-t-20 up-m-b-20">{{data.title}}</view>
 				<view class="rwcon">
-					如怀疑存在 DNS 劫持，可尝试更换 DNS 服务器或使用其他域名解析服务进行测试，以确定是否是 DNS 方面的问题
+					{{data.content}}
 				</view>
 				<view class="updateImg up-flex u-flex-wrap">
-					<image src="/static/logo.png" class="up-m-l-20 up-m-t-20"></image>
-					<image src="/static/logo.png" class="up-m-l-20 up-m-t-20"></image>
-					<image src="/static/logo.png" class="up-m-l-20 up-m-t-20"></image>
-					<image src="/static/logo.png" class="up-m-l-20 up-m-t-20"></image>
+					<block v-for="(item,index) in data.taskInfo.attachmentList" :key="index">
+						<image src="/static/fillImg.png" class="up-m-l-20 up-m-t-20"></image>
+					</block>
 				</view>
-				<view class="rightIcon">待处理</view>
+				<view class="rightIcon" v-if="data.taskInfo.status == 0" style="background:#3C82FE">进行中</view>
+				<view class="rightIcon" v-if="data.taskInfo.status == 1" style="background:#1CAA42">已完成</view>
+				<view class="rightIcon" v-if="data.taskInfo.status == 2" style="background:#FE4949">已超期</view>
+				<view class="rightIcon" v-if="data.taskInfo.status == 3">终止</view>
 			</view>
-			<view class="btnbox u-flex u-col-center">
-				<view class="btnleft">中止</view>
-				<view class="btnright">变更</view>
+			<view class="btnbox u-flex u-col-center" v-if="typeIndex==2">
+				<view class="btnleft" @click="zhongzTap()">中止</view>
+				<view class="btnright" @click="edit()">变更</view>
 			</view>
 			<!-- <view class="qued btn" style="position:absolute;bottom:50rpx;">完成</view> -->
 		</view>
@@ -39,10 +42,62 @@
 
 <script setup>
 	import {
+		API_taskDetail,
+		API_taskStop,
+		API_getProcessDetail
+	} from '/api/task.js'
+	import {
 		ref,
 		reactive,
 		onMounted
 	} from 'vue';
+	import {
+		onLoad
+	} from '@dcloudio/uni-app'
+	import {
+		useCounterStore
+	} from '/store/counter';
+	const store = useCounterStore();
+	const typeIndex = ref()
+	const taskId = ref()
+	const data = ref({})
+	const jindData = ref({})
+	onLoad((e) => {
+		console.log(e)
+		typeIndex.value = e.typeIndex
+		taskId.value = e.id
+		detileData();
+	})
+	const detileData = () => {
+		console.log(taskId.value)
+		// return
+		// API_taskDetail(taskId.value).then(res => {
+		// 	console.log(res)
+		// 	data.value = res.data
+		// })
+		API_getProcessDetail(taskId.value).then(res => {
+			data.value = res.data
+		})
+	}
+	const edit = () => {
+		uni.navigateTo({
+			url: '/pages/work/task/addtask?edit=1&taskId=' + taskId.value
+		})
+	}
+	const zhongzTap = () => {
+		uni.showModal({
+			title: '提示：',
+			content: '请确认是否中止',
+			success: function(res) {
+				if (res.confirm) {
+					API_taskStop(taskId.value).then(res => {
+						uni.$u.toast('中止成功')
+						uni.navigateBack()
+					})
+				}
+			}
+		});
+	}
 </script>
 
 
@@ -58,7 +113,8 @@
 	.btnbox {
 		position: absolute;
 		bottom: 5vw;
-		left:9vw;
+		left: 9vw;
+
 		.btnleft {
 			padding: 25rpx 115rpx;
 			font-size: 36rpx;
@@ -73,7 +129,7 @@
 			color: #FFFFFF;
 			background: #3C82FE;
 			border-radius: 59rpx;
-			margin-left:20rpx;
+			margin-left: 20rpx;
 		}
 	}
 

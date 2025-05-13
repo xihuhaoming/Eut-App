@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<up-navbar title="新增任务&通知" :placeholder="true" :autoBack="true" />
+		<up-navbar title="任务&通知" :placeholder="true" :autoBack="true" />
 		<view class="content">
 			<view class="typeTop up-flex u-row-center">
 				<hy-btn-group :list="typeList" v-model="typeValue" @itemClick="itemClick" :cancelSelectItem="false"
@@ -62,7 +62,9 @@
 
 <script setup>
 	import {
-		API_taskAdd
+		API_taskAdd,
+		API_taskDetail,
+		API_taskEdit
 	} from '../../../api/task.js'
 	import {
 		uploadFileFn
@@ -72,12 +74,35 @@
 		reactive,
 		onMounted
 	} from 'vue';
+	import {
+		onLoad
+	} from '@dcloudio/uni-app'
 	const fillList = ref([])
-	const typeValue = ref(1)
+	const typeValue = ref(0)
 	const timeshow1 = ref(false)
 	const endTime = ref('请选择')
 	const title = ref('')
 	const content = ref('')
+	const receiveUser = ref({
+		departList: [
+			"2020d4b7af34494540ac29b295ccd6a7",
+			"2438158ecf27f7693780a9f6b1014b0d"
+		],
+		userSysList: [
+			"20201104093740246601",
+			"20201104093507572009"
+		]
+	}, )
+	const copyUser = ref({
+		departList: [
+			"2020d4b7af34494540ac29b295ccd6a7",
+			"2438158ecf27f7693780a9f6b1014b0d"
+		],
+		userSysList: [
+			"20201104093740246601",
+			"20201104093507572009"
+		]
+	})
 	const typeList = reactive([{
 		label: '任务',
 		value: 0
@@ -87,40 +112,52 @@
 	}]);
 	const name = ref('')
 	const textValue = ref('')
+	const edit = ref()
+	onLoad((e) => {
+		console.log(e.edit)
+		edit.value = e.edit
+		if (e.edit == 1) {
+			API_taskDetail(e.taskId).then(res => {
+				title.value = res.data.title
+				content.value = res.data.content
+				endTime.value = res.data.endTime
+				receiveCount.value = res.data.receiveCount
+				copyCount.value = res.data.copyCount
+				fillList.value = res.data.attachmentList
+			})
+		}
+	})
 	const Submit = () => {
 		// console.log(from)
 		if (!title.value) return uni.$u.toast('请输入事项名称');
 		if (!endTime.value) return uni.$u.toast('请输入截止时间');
-		API_taskAdd({
-			type: typeValue.value,
-			endTime: endTime.value,
-			title: title.value,
-			content: content.value,
-			attachmentList: fillList.value,
-			receiveUser: {
-				departList: [
-					"2020d4b7af34494540ac29b295ccd6a7",
-					"2438158ecf27f7693780a9f6b1014b0d"
-				],
-				userSysList: [
-					"20201104093740246601",
-					"20201104093507572009"
-				]
-			},
-			copyUser: {
-				departList: [
-					"2020d4b7af34494540ac29b295ccd6a7",
-					"2438158ecf27f7693780a9f6b1014b0d"
-				],
-				userSysList: [
-					"20201104093740246601",
-					"20201104093507572009"
-				]
-			}
-		}).then(res => {
-			console.log(res)
-			uni.navigateBack()
-		})
+		if (edit.value == 1) {
+			// 修改
+			API_taskEdit({
+				type: typeValue.value,
+				endTime: endTime.value,
+				title: title.value,
+				content: content.value,
+				attachmentList: fillList.value,
+			}).then(res => {
+				console.log(res)
+				uni.navigateBack()
+			})
+		} else {
+			// 新增
+			API_taskAdd({
+				type: typeValue.value,
+				endTime: endTime.value,
+				title: title.value,
+				content: content.value,
+				attachmentList: fillList.value,
+				receiveUser: receiveUser.value,
+				copyUser: copyUser.value
+			}).then(res => {
+				console.log(res)
+				uni.navigateBack()
+			})
+		}
 	}
 	const delefill = (index) => {
 		fillList.value.splice(index, 1)

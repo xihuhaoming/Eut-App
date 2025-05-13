@@ -40,17 +40,17 @@
 									<view class="ttleft1 up-m-r-20"></view>
 									<view class="ttright">工作组名称</view>
 								</view>
-								<hy-btn-group class="up-m-t-30 up-m-l-20" :list="workList" v-model="workValue" @itemClick="itemClick1"
-									multiple :unSelectedStyle="{background: '#F5F7FB',color: '#5A78A0',borderColor: '#F5F7FB'}"
-									:selectedStyle="{background: '#ECF1FF',color: '#3C82FE',borderColor: '#ECF1FF'}"></hy-btn-group>
-								<!-- 工作组名称 -->
-								<view class="typeTitle u-flex u-col-center up-m-t-30">
-									<view class="ttleft1 up-m-r-20"></view>
-									<view class="ttright">工作组名称</view>
-								</view>
-								<hy-btn-group class="up-m-t-30 up-m-l-20" :list="workList2" v-model="workValue2" @itemClick="itemClick1"
-									multiple :unSelectedStyle="{background: '#F5F7FB',color: '#5A78A0',borderColor: '#F5F7FB'}"
-									:selectedStyle="{background: '#ECF1FF',color: '#3C82FE',borderColor: '#ECF1FF'}"></hy-btn-group>
+								<block v-if="typeIndex==0||typeIndex==1">
+									<hy-btn-group class="up-m-t-30 up-m-l-20" :list="workList" v-model="workValue" @itemClick="itemClick1"
+										:unSelectedStyle="{background: '#F5F7FB',color: '#5A78A0',borderColor: '#F5F7FB'}"
+										:selectedStyle="{background: '#ECF1FF',color: '#3C82FE',borderColor: '#ECF1FF'}"></hy-btn-group>
+								</block>
+								<block v-if="typeIndex==2||typeIndex==3">
+									<hy-btn-group class="up-m-t-30 up-m-l-20" :list="workList2" v-model="workValue2"
+										@itemClick="itemClick1"
+										:unSelectedStyle="{background: '#F5F7FB',color: '#5A78A0',borderColor: '#F5F7FB'}"
+										:selectedStyle="{background: '#ECF1FF',color: '#3C82FE',borderColor: '#ECF1FF'}"></hy-btn-group>
+								</block>
 							</view>
 							<view class="slotCon up-flex up-text-center u-row-around up-p-t-40 up-p-b-40">
 								<view class="timeBtn" @click="chongzTime">重置</view>
@@ -113,13 +113,16 @@
 		</view>
 		<view class="taskbox" v-if="typeIndex==2">
 			<block v-if="issuedList.value.length">
-				<view class="taskItem" v-for="(item,index) in issuedList.value" :key="index">
+				<view class="taskItem" v-for="(item,index) in issuedList.value" :key="index" @click="detileTap(item)">
 					<view class="titemTop u-flex u-row-between up-p-b-15">
 						<view class="ttleft u-flex u-col-center">
 							<image src="/static/work/time.png"></image>
 							<view>{{item.createInDate}}</view>
 						</view>
-						<view class="ttright">待确认:{{item.waitConfirmCount}}</view>
+						<view class="ttright" style="color:#3C82FE" v-if="item.status==0">进行中:{{item.waitConfirmCount}}</view>
+						<view class="ttright" style="color:#1CAA42" v-if="item.status==1">已完成</view>
+						<view class="ttright" style="color:#FE4949" v-if="item.status==2">已超期</view>
+						<view class="ttright" style="color:#FEAC49" v-if="item.status==3">终止</view>
 					</view>
 					<view class="task-title up-m-t-20 bold">
 						{{item.title}}
@@ -136,13 +139,20 @@
 		</view>
 		<view class="taskbox" v-if="typeIndex==3">
 			<block v-if="copyList.value.length">
-				<view class="taskItem" v-for="(item,index) in copyList.value" :key="index">
+				<view class="taskItem" v-for="(item,index) in copyList.value" :key="index" @click="detileTap(item)">
 					<view class="titemTop u-flex u-row-between up-p-b-15">
 						<view class="ttleft u-flex u-col-center">
 							<image src="/static/work/time.png"></image>
 							<view>{{item.createInDate}}</view>
 						</view>
-						<view class="ttright">待确认:{{item.waitConfirmCount}}</view>
+
+						<view class="ttright" style="color:#3C82FE" v-if="item.status==0">进行中:{{item.waitConfirmCount}}</view>
+						<view class="ttright" style="color:#1CAA42" v-if="item.status==1">已完成</view>
+						<view class="ttright" style="color:#FE4949" v-if="item.status==2">已超期</view>
+						<view class="ttright" style="color:#FEAC49" v-if="item.status==3">终止</view>
+
+
+
 					</view>
 					<view class="task-title up-m-t-20 bold">
 						{{item.title}}
@@ -181,7 +191,8 @@
 	} from 'vue';
 	import {
 		onReachBottom,
-		onLoad
+		onLoad,
+		onShow
 	} from "@dcloudio/uni-app"
 
 
@@ -207,30 +218,33 @@
 	}]);
 
 	const workList = reactive([{
-			label: '采购流程',
-			value: 1
+			label: '待处理',
+			value: 0
 		}, {
-			label: '入库流程',
+			label: '处理中',
+			value: 1
+		},
+		{
+			label: '已完成',
 			value: 2
 		},
 		{
-			label: '合同流程',
+			label: '已驳回',
 			value: 3
-		},
-		{
-			label: '工作流流程',
-			value: 4
 		},
 	]);
 	const workList2 = reactive([{
-			label: '采购流程',
-			value: 1
+			label: '进行中',
+			value: 0
 		}, {
-			label: '入库流程',
-			value: 2
+			label: '已完成',
+			value: 1
 		},
 		{
-			label: '合同流程',
+			label: '已超期',
+			value: 2
+		}, {
+			label: '终止',
 			value: 3
 		}
 	]);
@@ -249,10 +263,10 @@
 	const completedList = reactive([])
 	const issuedList = reactive([])
 	const copyList = reactive([])
-	onMounted(() => {
+	onShow(() => {
 		tasklistData();
 	})
-	
+
 	// 列表
 	const tasklistData = () => {
 		let noticeTypes = typeValue.join(',')
@@ -265,12 +279,15 @@
 		if (endTime.value == '结束时间') {
 			endTimeData = ""
 		}
+		let status;
+
 		API_taskList({
 			type: typeIndex.value,
 			startTime: startTimeData,
 			endTime: endTimeData,
 			noticeTypes: noticeTypes,
-			title: keyword.value
+			title: keyword.value,
+			status: workValue.value
 		}).then(res => {
 			console.log(res)
 			todoList.value = res.data.todoList
@@ -279,7 +296,15 @@
 			copyList.value = res.data.copyList
 		})
 	}
-
+	// 详情
+	const detileTap = (item) => {
+		console.log(item)
+		if (typeIndex.value == 2 || typeIndex.value == 3) {
+			uni.navigateTo({
+				url: `/pages/work/task/taskDetile2?typeIndex=${typeIndex.value}&id=${item.id}`
+			})
+		}
+	}
 	onReachBottom(() => {
 		console.log("触底")
 	})
@@ -304,6 +329,7 @@
 	// 选择类型
 	const itemClick1 = (e) => {
 		console.log(e)
+		workValue.value = e.val
 	}
 	// 选择时间
 	const timeTan = (e) => {
@@ -326,15 +352,17 @@
 		startTime.value = "开始时间"
 		endTime.value = "结束时间"
 		typeValue.length = 0;
-		workValue.length = 0;
-		workValue2.length = 0;
+		// workValue.length = 0;
+		// workValue2.length = 0;
 	}
 	// 时间确定
 	const SubmitTime = () => {
+		console.log(workValue.value)
+		tasklistData();
 		uDropdownRef.value.close()
 		typeValue.length = 0;
-		workValue.length = 0;
-		workValue2.length = 0;
+		// workValue.length = 0;
+		// workValue2.length = 0;
 		startTime.value = "开始时间";
 		endTime.value = "结束时间";
 
@@ -367,7 +395,7 @@
 		box-shadow: 0rpx 6rpx 26rpx 1rpx rgba(138, 139, 143, 0.16);
 		border-radius: 10rpx;
 		padding: 30rpx;
-		margin-top:30rpx;
+		margin-top: 30rpx;
 
 		.titemTop {
 			border-bottom: 1rpx solid #F5F5F5;

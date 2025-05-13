@@ -3,10 +3,10 @@
 		<view class="pagetitle">个人中心</view>
 		<view class="pagebox">
 			<view class="usercon up-p-t-40">
-				<image class="toux" :src="absoluteUrl.value"></image>
-				<view class="name bold">{{info.name}}</view>
-				<view class="bum up-m-t-5 up-m-b-5">{{info.deptList[0].name}}</view>
-				<view class="phone">{{info.sysNo}}</view>
+				<!-- <image class="toux" :src="store.userInfo.avatar"></image> -->
+				<view class="name bold">{{store.userInfo.name}}</view>
+				<view class="bum up-m-t-5 up-m-b-5">{{store.userInfo.deptList[0].name}}</view>
+				<view class="phone">{{store.userInfo.sysNo}}</view>
 				<view class="bianj up-flex u-col-center">
 					<image src="/static/user/xiug.png"></image>
 					<view @click="updata">编辑</view>
@@ -47,14 +47,14 @@
 	import {
 		useCounterStore
 	} from '/store/counter';
+	const store = useCounterStore();
 	import {
 		setToken,
 		getToken
 	} from '/util/auth.js'
-	const store = useCounterStore();
-	console.log(store)
 	const absoluteUrl = ref('')
-	const info = store.userInfo;
+	// const info = store.userInfo;
+	// console.log(info)
 	const updata = () => {
 		uni.chooseImage({
 			count: 1, //默认9
@@ -83,7 +83,7 @@
 						}
 					})
 				})
-				
+
 
 
 				// }
