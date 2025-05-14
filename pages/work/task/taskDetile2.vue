@@ -72,7 +72,7 @@
 	})
 	const CompletionTap = () => {
 		uni.navigateTo({
-			url:'/pages/work/task/Completion'
+			url:'/pages/work/task/Completion?taskId='+taskId.value
 		})
 	}
 	const detileData = () => {

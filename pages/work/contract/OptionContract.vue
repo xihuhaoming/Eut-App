@@ -3,46 +3,50 @@
 		<up-navbar title="选择合同" :placeholder="true" :autoBack="true" />
 
 		<view class="up-p-t-20 up-p-b-20" style="background:#ffffff;">
-			<up-search class="up-m-b-20" placeholder="请输入查找内容" v-model="keyword" :showAction="false" bgColor="#F6F8FC"
+			<up-search class="up-m-b-20" placeholder="请输入查找内容" v-model="searchParam" :showAction="false" bgColor="#F6F8FC"
 				height="40"></up-search>
 
 		</view>
 		<view class="taskbox">
-			<view class="taskItem">
-				<view class="titemTop u-flex u-row-between up-p-b-15">
-					<view class="ttleft u-flex u-col-center">
+			<block v-if="listData">
+				<view class="taskItem up-m-t-20" v-for="(item,index) in listData" :key="index">
+					<view class="titemTop u-flex u-row-between up-p-b-15">
+						<view class="ttleft u-flex u-col-center">
 
-						<view>2EUT-HT-LS-1901</view>
-					</view>
-					<view class="ttright">查看</view>
-					<!-- 	<view class="ttright" style="color:#FE4949">待确认</view>
+							<view>{{item.code}}</view>
+						</view>
+						<view class="ttright">查看</view>
+						<!-- 	<view class="ttright" style="color:#FE4949">待确认</view>
 						<view class="ttright" style="color:#1CAA42">待确认</view>
 						<view class="ttright" style="color:#092D5C">已作废</view> -->
-				</view>
-				<view class="task-title up-m-t-20 bold">
-					嘉兴星程电子有限公司
-				</view>
-				<!-- <view class="tasktext up-m-b-10" style="color:#3C82FE">TU-UI69-7329589 </view> -->
-				<view class="tasktext">签单时间：2023.04.08</view>
-				<view class="tasktext">部门：数字中心</view>
-				<view class="tasktext">签单人：负责人</view>
-				<view class="tasktext">合同金额：<text style="color:red">28930.00</text></view>
-				<view class="tasktext">开票情况：<text style="color:red">28930.00</text></view>
-				<view class="tasktext">交款情况：<text style="color:red">28930.00</text></view>
-				<view class="tasktext">指令单情况：</view>
-				<view class="u-flex u-row-between">
-					<view class="tasktext" style="color:#3C82FE">职业病危害因素检测与评价</view>
-					<view class="tasktext">指令单已下发</view>
-				</view>
-				<view class="u-flex u-row-between">
-					<view class="tasktext" style="color:#3C82FE">职业病危害因素检测与评价</view>
-					<view class="tasktext">出证<text style="color:red">（超时）</text></view>
-				</view>
-				<!-- <view class="tasktext">产品：<text style="color:#3C82FE">IS9001</text></view> -->
+					</view>
+					<view class="task-title up-m-t-20 bold">
+						{{item.csrCustomerName}}
+					</view>
+					<!-- <view class="tasktext up-m-b-10" style="color:#3C82FE">TU-UI69-7329589 </view> -->
+					<view class="tasktext">签单时间：{{item.signUpDate}}</view>
+					<view class="tasktext">部门：{{item.deptName}}</view>
+					<view class="tasktext">签单人：{{item.userName}}</view>
+					<view class="tasktext">合同金额：<text style="color:red">{{item.allPrice}}</text></view>
+					<view class="tasktext">开票情况：<text style="color:red">{{item.invoicePrice}}</text></view>
+					<view class="tasktext">交款情况：<text style="color:red">{{item.putPrice}}</text></view>
+					<view class="tasktext">指令单情况：</view>
+					<view class="u-flex u-row-between" v-for="(it,i) in item.serverList" :key="i">
+						<view class="tasktext" style="color:#3C82FE">{{it.proServeName}}</view>
+						<view class="tasktext">{{it.progressName}}
+							<text style="color:red" v-if="it.useStatus==0">（进行中）</text>
+							<text style="color:red" v-if="it.useStatus==1">（完成）</text>
+							<text style="color:red" v-if="it.useStatus==2">（停项）</text>
+							<text style="color:red" v-if="it.useStatus==-1">（超期）</text>
+						</view>
+					</view>
 
-			</view>
+					<!-- <view class="tasktext">产品：<text style="color:#3C82FE">IS9001</text></view> -->
+
+				</view>
+			</block>
+			<up-empty v-else class="up-m-t-50" mode="list" icon="/static/ques.png"></up-empty>
 		</view>
-		<image src="/static/work/jia.png" class="tianj" @click="addnavTap('/pages/work/contract/addContract')"></image>
 
 	</view>
 </template>
@@ -58,6 +62,7 @@
 	} from 'vue';
 
 	const searchParam = ref("")
+	const listData = ref([])
 	onMounted(() => {
 		getList()
 	})
@@ -66,6 +71,7 @@
 			searchParam: searchParam.value
 		}).then(res => {
 			console.log(res)
+			listData.value = res.data
 		})
 	}
 	// 跳转

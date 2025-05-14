@@ -138,7 +138,7 @@
 			<up-empty v-else class="up-m-t-50" mode="list" icon="/static/ques.png"></up-empty>
 		</view>
 		<view class="taskbox" v-if="typeIndex==3">
-			<block v-if="copyList.value?.length ">
+			<block v-if="copyList.value?.length">
 				<view class="taskItem" v-for="(item,index) in copyList.value" :key="index" @click="detileTap(item)">
 					<view class="titemTop u-flex u-row-between up-p-b-15">
 						<view class="ttleft u-flex u-col-center">

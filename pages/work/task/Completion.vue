@@ -27,28 +27,13 @@
 						<view class="slot-content up-p-l-25 up-p-r-25">
 							<view class="slotCon up-text-center up-content-color up-p-t-40 up-p-b-40">
 								<!-- 任务 -->
-								<view class="typeTitle u-flex u-col-center ">
-									<view class="ttleft up-m-r-20"></view>
-									<view class="ttright">任务&通知</view>
-								</view>
-								<hy-btn-group class="up-m-t-30 up-m-l-20" :list="typeList" v-model="typeValue" @itemClick="itemClick1"
-									multiple :unSelectedStyle="{background: '#F5F7FB',color: '#5A78A0',borderColor: '#F5F7FB'}"
-									:selectedStyle="{background: '#ECF1FF',color: '#3C82FE',borderColor: '#ECF1FF'}"></hy-btn-group>
 								<!-- 工作组名称 -->
-								<view class="typeTitle u-flex u-col-center up-m-t-30">
+								<view class="typeTitle u-flex u-col-center up-m-t-0">
 									<view class="ttleft1 up-m-r-20"></view>
 									<view class="ttright">工作组名称</view>
 								</view>
 								<hy-btn-group class="up-m-t-30 up-m-l-20" :list="workList" v-model="workValue" @itemClick="itemClick1"
-									multiple :unSelectedStyle="{background: '#F5F7FB',color: '#5A78A0',borderColor: '#F5F7FB'}"
-									:selectedStyle="{background: '#ECF1FF',color: '#3C82FE',borderColor: '#ECF1FF'}"></hy-btn-group>
-								<!-- 工作组名称 -->
-								<view class="typeTitle u-flex u-col-center up-m-t-30">
-									<view class="ttleft1 up-m-r-20"></view>
-									<view class="ttright">工作组名称</view>
-								</view>
-								<hy-btn-group class="up-m-t-30 up-m-l-20" :list="workList2" v-model="workValue2" @itemClick="itemClick1"
-									multiple :unSelectedStyle="{background: '#F5F7FB',color: '#5A78A0',borderColor: '#F5F7FB'}"
+									:multiple="false" :unSelectedStyle="{background: '#F5F7FB',color: '#5A78A0',borderColor: '#F5F7FB'}"
 									:selectedStyle="{background: '#ECF1FF',color: '#3C82FE',borderColor: '#ECF1FF'}"></hy-btn-group>
 							</view>
 							<view class="slotCon up-flex up-text-center u-row-around up-p-t-40 up-p-b-40">
@@ -62,32 +47,21 @@
 			</view>
 		</view>
 		<view class="taskbox">
-			<view class="taskItem up-m-t-30">
-				<view class="u-flex u-row-between">
-					<view class="itleft">人员名称</view>
-					<view class="itleft2">退回</view>
-	<!-- 				<view class="itleft2" style="background-color:#1CAA42;">已完成</view>
-					<view class="itleft2" style="background-color:#FEAC49;">待确认</view> -->
-					<view class="itright up-m-l-80">2023.03.05 12:00</view>
-					<view class="itright2">查看</view>
+			<!-- <block v-if="listData.value?.length"> -->
+			<view class="taskItem up-m-t-30" v-for="(item,index) in listData" :key="index">
+				<view class="u-flex u-row-between u-col-center">
+					<view class="itleft" style="width:120rpx">{{item.userName}}</view>
+					<view class="itleft2" v-if="item.status==0" style="background-color:#3C82FE;">待完成</view>
+					<view class="itleft2" v-if="item.status==2" style="background-color:#1CAA42;">已确认</view>
+					<view class="itleft2" v-if="item.status==1" style="background-color:#FEAC49;">待确认</view>
+					<view class="itleft2" v-if="item.status==3">退回</view>
+
+					<view class="itright up-m-l-20">{{item.completeTime}}</view>
+					<view class="itright2" @click="chak(item.taskReplyId)">查看</view>
 				</view>
 			</view>
-			<view class="taskItem up-m-t-30">
-				<view class="u-flex u-row-between">
-					<view class="itleft">人员名称</view>
-					<view class="itleft2">退回</view>
-					<view class="itright up-m-l-80">2023.03.05 12:00</view>
-					<view class="itright2">查看</view>
-				</view>
-			</view>
-			<view class="taskItem up-m-t-30">
-				<view class="u-flex u-row-between">
-					<view class="itleft">人员名称</view>
-					<view class="itleft2">退回</view>
-					<view class="itright up-m-l-80">2023.03.05 12:00</view>
-					<view class="itright2">查看</view>
-				</view>
-			</view>
+			<!-- </block>
+			<up-empty v-else class="up-m-t-50" mode="list" icon="/static/ques.png"></up-empty> -->
 		</view>
 
 
@@ -103,6 +77,12 @@
 
 <script setup>
 	import {
+		API_taskReplyList
+	} from '/api/task.js'
+	import {
+		onLoad
+	} from '@dcloudio/uni-app'
+	import {
 		ref,
 		reactive,
 		onMounted
@@ -116,43 +96,63 @@
 	}]);
 
 	const workList = reactive([{
-			label: '采购流程',
-			value: 1
+			label: '待完成',
+			value: 0
 		}, {
-			label: '入库流程',
+			label: '待确认',
+			value: 1
+		},
+		{
+			label: '已完成',
 			value: 2
 		},
 		{
-			label: '合同流程',
+			label: '驳回',
 			value: 3
 		},
-		{
-			label: '工作流流程',
-			value: 4
-		},
 	]);
-	const workList2 = reactive([{
-			label: '采购流程',
-			value: 1
-		}, {
-			label: '入库流程',
-			value: 2
-		},
-		{
-			label: '合同流程',
-			value: 3
-		}
-	]);
+	const listData = ref([])
 	const typeValue = reactive([])
 	const workValue = reactive([])
-	const workValue2 = reactive([])
 	const uDropdownRef = ref(null)
 	const startTime = ref('开始时间')
 	const endTime = ref('结束时间')
 	const timeshow1 = ref(false);
 	const timeshow2 = ref(false);
-
+	const taskId = ref()
 	const keyword = ref('')
+	onLoad((e) => {
+		taskId.value = e.taskId
+		ReplyList();
+	})
+	const chak = (taskReplyId) => {
+		uni.navigateTo({
+			url: '/pages/work/task/commit?taskReplyId=' + taskReplyId
+		})
+	}
+	const ReplyList = () => {
+		console.log(taskId)
+		let startTimeData, endTimeData;
+		startTimeData = startTime.value
+		endTimeData = endTime.value
+		if (startTime.value == '开始时间') {
+			startTimeData = ""
+		}
+		if (endTime.value == '结束时间') {
+			endTimeData = ""
+		}
+		console.log(workValue.value)
+		API_taskReplyList({
+			taskId: taskId.value,
+			searchParam: keyword.value,
+			status: workValue.value,
+			startDate: startTimeData,
+			endDate: endTimeData
+		}).then(res => {
+			console.log(res)
+			listData.value = res.data
+		})
+	}
 	// 新增任务
 	const addnavTap = (url) => {
 		uni.navigateTo({
@@ -168,6 +168,7 @@
 	// 选择类型
 	const itemClick1 = (e) => {
 		console.log(e)
+		workValue.value = e.val
 	}
 	// 选择时间
 	const timeTan = (e) => {
@@ -177,10 +178,10 @@
 			timeshow2.value = true
 		}
 	}
-	const confirm1 = (e) => {
-		startTime.value = formatTimestamp(e.value)
-		timeshow1.value = false;
-	}
+	// const confirm1 = (e) => {
+	// 	startTime.value = formatTimestamp(e.value)
+	// 	timeshow1.value = false;
+	// }
 	const confirm2 = (e) => {
 		endTime.value = formatTimestamp(e.value)
 		timeshow2.value = false;
@@ -195,10 +196,9 @@
 	}
 	// 时间确定
 	const SubmitTime = () => {
+		ReplyList();
 		uDropdownRef.value.close()
-		typeValue.length = 0;
 		workValue.length = 0;
-		workValue2.length = 0;
 		startTime.value = "开始时间";
 		endTime.value = "结束时间";
 

@@ -59,7 +59,7 @@
 			arr: [{
 					img: "/static/work/icon7.png",
 					name: "客户",
-					url: ""
+					url: "/pages/work/Client/List"
 				},
 				{
 					img: "/static/work/icon8.png",

@@ -18,7 +18,8 @@
 					<up-cell title="申请部门" value="易尤特集团" :isLink="true" arrow-direction="right" :required="true"></up-cell>
 					<up-cell title="开票流程" value="易尤特集团" :isLink="true" arrow-direction="right" :required="true"></up-cell>
 					<up-cell title="办理人" value="易尤特集团" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-					<up-cell title="合同编号" value="易尤特集团" :isLink="true" arrow-direction="right" :required="true"></up-cell>
+					<up-cell title="合同编号" value="易尤特集团" :isLink="true" arrow-direction="right" :required="true"
+						@click="navcon()"></up-cell>
 					<up-cell title="未开票金额" value="易尤特集团" :isLink="false" arrow-direction="right" :required="false"></up-cell>
 					<up-cell title="开票流程中金额" value="易尤特集团" :isLink="false" arrow-direction="right" :required="false"></up-cell>
 					<!-- 	<up-cell title="事项名称" isLink :required="true">
@@ -245,7 +246,12 @@
 	const timeshow1 = ref(false);
 	const timeshow2 = ref(false);
 
-
+	// 选择合同
+	const navcon = () => {
+		uni.navigateTo({
+			url:'/pages/work/contract/OptionContract'
+		})
+	}
 	// 选择类型Z 
 	const itemClick = (e) => {
 		console.log(e)
