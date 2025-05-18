@@ -33,14 +33,6 @@
 							<view style="color:#FE4949">1000</view>
 						</template>
 					</up-cell>
-
-
-					<!-- 	<up-cell title="事项名称" isLink :required="true">
-						<template #value>
-							<input v-model="name" placeholder="请输入事项名称" type="text"
-								style="text-align:right;color:#092D5C;font-size:26rpx;">
-						</template>
-					</up-cell> -->
 				</up-cell-group>
 				<view class="u-flex u-row-between u-col-center">
 					<view class="xtitle bold">产品及付款信息</view>

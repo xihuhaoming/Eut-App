@@ -9,8 +9,8 @@ if (platform === 'h5') {
 	if (env === 'production') {
 		APIURL = 'https://erp.eut.prd4.weiniaokeji.cn/front';
 	} else {
-		// APIURL = 'https://erp.eut.prd4.weiniaokeji.cn/front';
-		APIURL = 'http://erp.frp.xiaojinyu.fun';
+		APIURL = 'https://erp.eut.prd4.weiniaokeji.cn/front';
+		// APIURL = 'http://erp.frp.xiaojinyu.fun';
 	}
 } else {
 	if (env === 'production') {
