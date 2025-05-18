@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<up-navbar title="开票申请" :placeholder="true" :autoBack="true" />
+		<up-navbar title="开票申请" :placeholder="true" :autoBack="true" @leftClick="backTap()" />
 		<up-tabs :scrollable="false" :list="list" @click="tabclick"
 			itemStyle="padding:0 50rpx; height: 34rpx; margin:30rpx 0;" inactiveStyle="font-size: 28rpx;color: #B7C4D7;"
 			activeStyle="color: #092D5C;font-size:30rpx"></up-tabs>
@@ -15,13 +15,17 @@
 			</view>
 			<view class="card">
 				<up-cell-group :border="false">
-					<up-cell title="申请部门" value="易尤特集团" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-					<up-cell title="开票流程" value="易尤特集团" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-					<up-cell title="办理人" value="易尤特集团" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-					<up-cell title="合同编号" value="易尤特集团" :isLink="true" arrow-direction="right" :required="true"
+					<up-cell title="申请部门" :value="entDeptName" :isLink="true" arrow-direction="right" :required="true"
+						@click="deptshow= true"></up-cell>
+					<up-cell title="开票流程" :value="statuValue" :isLink="true" arrow-direction="right" :required="true"
+						@click="statusshow= true"></up-cell>
+					<up-cell title="办理人" :value="user" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+					<up-cell title="合同编号" :value="contractData.code" :isLink="true" arrow-direction="right" :required="true"
 						@click="navcon()"></up-cell>
-					<up-cell title="未开票金额" value="易尤特集团" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-					<up-cell title="开票流程中金额" value="易尤特集团" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+					<up-cell title="未开票金额" :value="(contractData.allPrice-contractData.invoicePrice)" :isLink="false"
+						arrow-direction="right" :required="false"></up-cell>
+					<up-cell title="开票流程中金额" :value="contractData.applyingInvoicePrice" :isLink="false" arrow-direction="right"
+						:required="false"></up-cell>
 					<!-- 	<up-cell title="事项名称" isLink :required="true">
 						<template #value>
 							<input v-model="name" placeholder="请输入事项名称" type="text"
@@ -31,34 +35,92 @@
 				</up-cell-group>
 				<view class="u-flex u-row-between u-col-center">
 					<view class="xtitle bold">添加产品</view>
-					<view class="u-flex u-col-center">
+					<view class="u-flex u-col-center" @click="addprod()">
 						<view class="up-m-r-10" style="font-size: 26rpx;color: #B7C4D7;">添加产品</view>
 						<up-icon name="plus-circle" size="20px" color="#5A78A0"></up-icon>
 					</view>
 				</view>
-				<view class="card">
-					<up-cell-group :border="false">
-						<up-cell title="产品" value="IS9001" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-						<up-cell title="开票金额" value="5000" :isLink="false" arrow-direction="right" :required="true"></up-cell>
-						<view class="up-m-t-20 up-m-t-20 u-text-center" style="color:red">删除</view>
-					</up-cell-group>
-				</view>
+				<block v-for="(item,index) in prodList" :key="index">
+					<view class="card up-m-t-20">
+						<up-cell-group :border="false">
+							<up-cell title="产品" :value="prodList[index].proServeName" :isLink="true" arrow-direction="right" :required="true"
+								@click="proTap(index)"></up-cell>
+							<up-cell title="开票金额" :value="prodList[index].invoicePrice" :isLink="false" arrow-direction="right" :required="true"></up-cell>
+							<view class="up-m-t-20 up-m-t-20 u-text-center" style="color:red" @click="delitTap(index)">删除</view>
+						</up-cell-group>
+					</view>
+				</block>
 				<view class="xtitle bold">
 					企业信息
 				</view>
 				<view class="card">
 					<up-cell-group :border="false">
-						<up-cell title="*企业名称" value="IS9001" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-						<up-cell title="税号" value="5000" :isLink="false" arrow-direction="right" :required="true"></up-cell>
-						<up-cell title="地址" value="5000" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-						<up-cell title="电话" value="5000" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-						<up-cell title="开票公司" value="5000" :isLink="false" arrow-direction="right" :required="true"></up-cell>
-						<up-cell title="开票电话" value="5000" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-						<up-cell title="开票联系方式" value="5000" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-						<up-cell title="银行账号" value="5000" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-						<up-cell title="开户行" value="5000" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-						<up-cell title="开票邮箱" value="5000" :isLink="false" arrow-direction="right" :required="true"></up-cell>
-						<up-cell title="开票金额" value="5000" :isLink="false" arrow-direction="right" :required="true"></up-cell>
+						<up-cell title="企业名称" :required="true" :isLink="false">
+							<template #value>
+								<input v-model="inEntName" placeholder="请输入" type="text"
+									style="text-align:right;color:#092D5C;font-size:26rpx;">
+							</template>
+						</up-cell>
+						<up-cell title="税号" :required="true" :isLink="false">
+							<template #value>
+								<input v-model="csrCustomerCode" placeholder="请输入" type="text"
+									style="text-align:right;color:#092D5C;font-size:26rpx;">
+							</template>
+						</up-cell>
+						<up-cell title="地址" :required="false" :isLink="false">
+							<template #value>
+								<input v-model="csrAddress" placeholder="请输入" type="text"
+									style="text-align:right;color:#092D5C;font-size:26rpx;">
+							</template>
+						</up-cell>
+						<up-cell title="电话" :required="false" :isLink="false">
+							<template #value>
+								<input v-model="csrPhone" placeholder="请输入" type="text"
+									style="text-align:right;color:#092D5C;font-size:26rpx;">
+							</template>
+						</up-cell>
+						<up-cell title="开票公司" :required="true" :isLink="false">
+							<template #value>
+								<input v-model="invoiceName" placeholder="请输入" type="text"
+									style="text-align:right;color:#092D5C;font-size:26rpx;">
+							</template>
+						</up-cell>
+						<up-cell title="开票电话" :required="false" :isLink="false">
+							<template #value>
+								<input v-model="invoiceTel" placeholder="请输入" type="text"
+									style="text-align:right;color:#092D5C;font-size:26rpx;">
+							</template>
+						</up-cell>
+						<up-cell title="开票联系方式" :required="false" :isLink="false">
+							<template #value>
+								<input v-model="invoicePhone" placeholder="请输入" type="text"
+									style="text-align:right;color:#092D5C;font-size:26rpx;">
+							</template>
+						</up-cell>
+						<up-cell title="银行账号" :required="false" :isLink="false">
+							<template #value>
+								<input v-model="bankAccount" placeholder="请输入" type="text"
+									style="text-align:right;color:#092D5C;font-size:26rpx;">
+							</template>
+						</up-cell>
+						<up-cell title="开户行" :required="false" :isLink="false">
+							<template #value>
+								<input v-model="bankType" placeholder="请输入" type="text"
+									style="text-align:right;color:#092D5C;font-size:26rpx;">
+							</template>
+						</up-cell>
+						<up-cell title="开票邮箱" :required="true" :isLink="false">
+							<template #value>
+								<input v-model="invoiceEmail" placeholder="请输入" type="text"
+									style="text-align:right;color:#092D5C;font-size:26rpx;">
+							</template>
+						</up-cell>
+						<up-cell title="开票邮箱" :required="true" :isLink="false">
+							<template #value>
+								<input v-model="recPrice" placeholder="请输入" type="text"
+									style="text-align:right;color:#092D5C;font-size:26rpx;">
+							</template>
+						</up-cell>
 					</up-cell-group>
 				</view>
 				<!-- 			<view class="attachmentTitle u-flex up-m-t-30 u-row-between ">
@@ -78,7 +140,7 @@
 					<textarea type="textarea" placeholder="请输入备注" border="surround" v-model="textValue"></textarea>
 				</view>
 			</view>
-			<view class="qued up-m-t-70">提交</view>
+			<view class="qued up-m-t-70" @click="addData()">提交</view>
 
 		</view>
 		<view class="content1" v-if="tabIndex == 1">
@@ -167,6 +229,15 @@
 
 
 		</view>
+		<!-- 选择产品 -->
+		<up-picker :show="proshow" :columns="[contractData.projContractServer]" keyName="proServeName" @cancel="proCancel"
+			@confirm="proconfirm"></up-picker>
+		<!-- 选择开票流程 -->
+		<up-picker :show="statusshow" :columns="useStatusList" keyName="value" @cancel="statusCancel"
+			@confirm="statusconfirm"></up-picker>
+		<!-- 选择部门 -->
+		<up-picker :show="deptshow" :columns="[store.userInfo.deptList]" keyName="name" @cancel="deptCancel"
+			@confirm="deptconfirm"></up-picker>
 		<!-- 选择时间 -->
 		<up-datetime-picker :minDate="1735660800000" :hasInput="false" class="timeView" hasInput :show="timeshow1"
 			v-model="startTime" mode="date" placeholder="开始时间" @confirm="confirm1"
@@ -179,12 +250,89 @@
 
 <script setup>
 	import {
+		API_invoiceApplyAdd,
+		API_contracthDetail
+	} from '/api/task.js'
+	import {
 		ref,
 		reactive,
 		onMounted
 	} from 'vue';
+	import {
+		onLoad
+	} from '@dcloudio/uni-app'
+	import {
+		useCounterStore
+	} from '/store/counter';
+	const store = useCounterStore();
+	const deptList1 = reactive([
+		[]
+	]);
+	const deptshow = ref(false)
+	const entDeptName = ref('')
+	const entDeptSysNo = ref('')
 	const tabIndex = ref(0)
 	const keyword = ref("")
+	entDeptName.value = store.userInfo.deptList[0].name
+	entDeptSysNo.value = store.userInfo.deptList[0].sysNo
+
+	const statusshow = ref(false)
+	const statuValue = ref('请选择')
+	const useStatus = ref('')
+	const useStatusList = reactive([
+		[{
+			value: '待确认',
+			id: 0
+		}, {
+			value: '已确认',
+			id: 1
+		}, {
+			value: '已拒绝',
+			id: 2
+		}, {
+			value: '已退回',
+			id: 3
+		}, {
+			value: '作废',
+			id: '-1'
+		}, {
+			value: '红冲',
+			id: '-2'
+		}, {
+			value: '开票流程',
+			id: 100
+		}, {
+			value: '作废流程中',
+			id: 200
+		}, {
+			value: '作废待确认',
+			id: 2000
+		}, {
+			value: '红冲流程中',
+			id: 300
+		}, {
+			value: '红冲待确认',
+			id: 3000
+		}]
+	]);
+	const user = ref('')
+	user.value = store.userInfo.name
+	const contractData = ref({
+		code: "请选择",
+		allPrice: 0,
+		putPrice: 0
+	})
+	const prodList = ref([])
+	const proshow = ref(false)
+	const projInvoiceSubs = ref([])
+	const proIndex = ref(0)
+
+
+
+
+
+
+
 	const list = reactive([{
 			name: '发起提交'
 		},
@@ -245,11 +393,97 @@
 	const endTime = ref('结束时间')
 	const timeshow1 = ref(false);
 	const timeshow2 = ref(false);
+	onMounted({
+		// await store.fetchUserInfo(); // 等待数据加载完成
+		// deptList1[0] = store.userInfo.deptList || []; // 赋值给响应式数组
+	});
+	onLoad((e) => {
+		if (e) {
+			console.log(e.sysNo)
+			contractDetile(e.sysNo)
+			// contractData.value = JSON.parse(e.item)
+		}
+	})
+	// 选择产品
+	const proTap = (index) => {
+		console.log(index)
+		proIndex.value = index
+		proshow.value = true
+	}
+	// 合同详情
+	const contractDetile = (sysNo) => {
+		API_contracthDetail({
+			sysNo: sysNo
+		}).then(res => {
+			contractData.value = res.data
+			console.log(contractData.value.projContractServer)
+		})
+	}
+	// 删除产品
+	const delitTap = (index) => {
+		prodList.value.splice(index, 1)
+	}
+	// 添加产品
+	const addprod = () => {
+		let obj = {
+			proServeName: "",
+			invoicePrice: ""
+		}
+		prodList.value.push({
+			...obj
+		})
+	}
+	// 返回
+	const backTap = () => {
+		uni.switchTab({
+			url: '/pages/work/work'
+		})
+	}
+	const deptCancel = () => {
+		deptshow.value = false
+	}
+	const statusCancel = () => {
+		statusshow.value = false
+	}
+	const proCancel = () => {
+		proshow.value = false
+	}
+	const proconfirm = (e) => {
+		console.log(e)
 
+		prodList.value[proIndex.value].proServeName = e.value[0].proServeName
+		prodList.value[proIndex.value].invoicePrice = e.value[0].invoicePrice
+		prodList.value[proIndex.value].projServerSysNo = e.value[0].projServerSysNo
+		// entDeptSysNo.value = e.value[0].sysNo
+		// entDeptName.value = e.value[0].name
+		proshow.value = false
+		
+		console.log(prodList.value)
+	}
+	const deptconfirm = (e) => {
+		console.log(e.value[0].name)
+		entDeptSysNo.value = e.value[0].sysNo
+		entDeptName.value = e.value[0].name
+		deptshow.value = false
+	}
+	const statusconfirm = (e) => {
+		console.log(e.value[0].value)
+		useStatus.value = e.value[0].id
+		statuValue.value = e.value[0].value
+		statusshow.value = false
+	}
+
+	// 新增
+	const addData = () => {
+		if (!useStatus.value) return uni.$u.toast('请选择开票流程')
+		API_invoiceApplyAdd({}).then(res => {
+
+		})
+	}
 	// 选择合同
 	const navcon = () => {
 		uni.navigateTo({
-			url:'/pages/work/contract/OptionContract'
+			url: '/pages/work/contract/OptionContract'
 		})
 	}
 	// 选择类型Z 

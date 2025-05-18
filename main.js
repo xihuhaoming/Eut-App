@@ -5,6 +5,7 @@ import App from './App'
 // import appApi from './api/index';
 import uviewPlus from '@/uni_modules/uview-plus'
 import '/util/request/http.interceptor.js'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 // #ifndef VUE3
 import Vue from 'vue'
 
@@ -40,7 +41,8 @@ export function createApp() {
 
 	// 实例化pina
 	const pinia = createPinia()
-	console.log(pinia)
+	pinia.use(piniaPluginPersistedstate);
+	// console.log(pinia)
 	app.use(pinia)
 	app.use(uviewPlus)
 	return {

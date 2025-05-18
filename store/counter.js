@@ -9,7 +9,9 @@ import {
 export const useCounterStore = defineStore('counter', {
 	state: () => {
 		return {
-			userInfo: {},
+			userInfo: {
+				depList:[]
+			},
 			pageSize: 10,
 			UPLOADURL: `${APIURL}/common/upload`, //上传地址
 		}
@@ -24,4 +26,5 @@ export const useCounterStore = defineStore('counter', {
 			}
 		},
 	},
+	persist: true
 })

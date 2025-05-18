@@ -54,7 +54,11 @@ export function API_taskReplyComplete(params) {
 export function API_getUnionContractList(params) {
 	return get('/contract/getUnionContractList', {params})
 }
-// 合同
+// 合同详情
+export function API_contracthDetail(params) {
+	return get('/projApi/proj/contract/hDetail', {params})
+}
+// 开票
 export function API_invoiceApplyAdd(params) {
 	return post('/invoiceApply/add', params)
 }

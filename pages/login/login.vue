@@ -85,6 +85,7 @@
 			if (code == 200) {
 				setToken(data.token)
 				store.setUserinfo(data.userInfo);
+		
 				uni.switchTab({
 					url: '/pages/index/index'
 				})

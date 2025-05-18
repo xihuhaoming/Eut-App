@@ -9,7 +9,7 @@
 		</view>
 		<view class="taskbox">
 			<block v-if="listData">
-				<view class="taskItem up-m-t-20" v-for="(item,index) in listData" :key="index">
+				<view class="taskItem up-m-t-20" v-for="(item,index) in listData" :key="index" @click="backkp(item)">
 					<view class="titemTop u-flex u-row-between up-p-b-15">
 						<view class="ttleft u-flex u-col-center">
 
@@ -66,6 +66,12 @@
 	onMounted(() => {
 		getList()
 	})
+	const backkp = (item)=>{
+		console.log(item)
+		uni.reLaunch({
+			url:`/pages/work/makeOut/addmake?sysNo=${item.sysNo}`
+		})
+	}
 	const getList = () => {
 		API_getUnionContractList({
 			searchParam: searchParam.value
