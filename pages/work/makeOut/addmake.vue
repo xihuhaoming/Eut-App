@@ -20,7 +20,7 @@
 					<up-cell title="开票流程" :value="statuValue" :isLink="true" arrow-direction="right" :required="true"
 						@click="statusshow= true"></up-cell>
 					<up-cell title="办理人" :value="user" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-					<up-cell title="合同编号" :value="contractData.code" :isLink="true" arrow-direction="right" :required="true"
+					<up-cell title="合同编号" :value="contractData.sysNo" :isLink="true" arrow-direction="right" :required="true"
 						@click="navcon()"></up-cell>
 					<up-cell title="未开票金额" :value="(contractData.allPrice-contractData.invoicePrice)" :isLink="false"
 						arrow-direction="right" :required="false"></up-cell>
@@ -43,9 +43,10 @@
 				<block v-for="(item,index) in prodList" :key="index">
 					<view class="card up-m-t-20">
 						<up-cell-group :border="false">
-							<up-cell title="产品" :value="prodList[index].proServeName" :isLink="true" arrow-direction="right" :required="true"
-								@click="proTap(index)"></up-cell>
-							<up-cell title="开票金额" :value="prodList[index].invoicePrice" :isLink="false" arrow-direction="right" :required="true"></up-cell>
+							<up-cell title="产品" :value="prodList[index].proServeName" :isLink="true" arrow-direction="right"
+								:required="true" @click="proTap(index)"></up-cell>
+							<up-cell title="开票金额" :value="prodList[index].recPrice" :isLink="false" arrow-direction="right"
+								:required="true"></up-cell>
 							<view class="up-m-t-20 up-m-t-20 u-text-center" style="color:red" @click="delitTap(index)">删除</view>
 						</up-cell-group>
 					</view>
@@ -115,7 +116,7 @@
 									style="text-align:right;color:#092D5C;font-size:26rpx;">
 							</template>
 						</up-cell>
-						<up-cell title="开票邮箱" :required="true" :isLink="false">
+						<up-cell title="开票金额" :required="true" :isLink="false">
 							<template #value>
 								<input v-model="recPrice" placeholder="请输入" type="text"
 									style="text-align:right;color:#092D5C;font-size:26rpx;">
@@ -146,7 +147,7 @@
 		<view class="content1" v-if="tabIndex == 1">
 			<view class="up-p-t-20" style="background:#ffffff;">
 				<up-search class="up-m-b-20" placeholder="请输入查找内容" v-model="keyword" :showAction="false" bgColor="#F6F8FC"
-					height="40"></up-search>
+					height="40" @search="getlistData()"></up-search>
 				<view class="u-flex filter u-col-center u-row-around">
 					<!-- 时间 -->
 					<up-dropdown ref="uDropdownRef" border-radius="20">
@@ -205,26 +206,28 @@
 				</view>
 			</view>
 			<view class="taskbox">
-				<view class="taskItem">
-					<view class="titemTop u-flex u-row-between up-p-b-15">
-						<view class="ttleft u-flex u-col-center">
-							<image src="/static/work/time.png"></image>
-							<view>2023.03.05 16:00</view>
-						</view>
-						<view class="ttright">待确认</view>
-						<!-- 	<view class="ttright" style="color:#FE4949">待确认</view>
+				<block v-for="(item,index) in ListData" :key="index">
+					<view class="taskItem up-m-t-20">
+						<view class="titemTop u-flex u-row-between up-p-b-15">
+							<view class="ttleft u-flex u-col-center">
+								<image src="/static/work/time.png"></image>
+								<view>{{item.createInDate}}</view>
+							</view>
+							<view class="ttright">{{item.useStatusStr}}</view>
+							<!-- 	<view class="ttright" style="color:#FE4949">待确认</view>
 						<view class="ttright" style="color:#1CAA42">待确认</view>
 						<view class="ttright" style="color:#092D5C">已作废</view> -->
+						</view>
+						<view class="task-title up-m-t-20 bold">
+							{{item.csrCustomerName}}
+						</view>
+						<view class="tasktext up-m-b-10" style="color:#B7C4D7">{{item.code}}</view>
+						<view class="tasktext">开票金额：<text style="color:red">{{item.recPrice}}</text></view>
+						<view class="tasktext">合同编码：{{item.projContractSysNo}}</view>
+						<view class="tasktext">部门：{{item.entDeptName}}</view>
+						<view class="tasktext">负责人：{{item.inUserName}}</view>
 					</view>
-					<view class="task-title up-m-t-20 bold">
-						河南微鸟科技网络有限公司
-					</view>
-					<view class="tasktext up-m-b-10" style="color:#B7C4D7">S8D00F9A0D9-ASSD </view>
-					<view class="tasktext">开票金额：<text style="color:red">28930.00</text></view>
-					<view class="tasktext">合同编码：EUT-HT-LS-1901</view>
-					<view class="tasktext">部门：数字工程中心</view>
-					<view class="tasktext">负责人：易尤特</view>
-				</view>
+				</block>
 			</view>
 
 
@@ -233,7 +236,7 @@
 		<up-picker :show="proshow" :columns="[contractData.projContractServer]" keyName="proServeName" @cancel="proCancel"
 			@confirm="proconfirm"></up-picker>
 		<!-- 选择开票流程 -->
-		<up-picker :show="statusshow" :columns="useStatusList" keyName="value" @cancel="statusCancel"
+		<up-picker :show="statusshow" :columns="useStatusList" keyName="processName" @cancel="statusCancel"
 			@confirm="statusconfirm"></up-picker>
 		<!-- 选择部门 -->
 		<up-picker :show="deptshow" :columns="[store.userInfo.deptList]" keyName="name" @cancel="deptCancel"
@@ -251,7 +254,9 @@
 <script setup>
 	import {
 		API_invoiceApplyAdd,
-		API_contracthDetail
+		API_contracthDetail,
+		API_ProjInvoicePage,
+		API_getStartProcessList
 	} from '/api/task.js'
 	import {
 		ref,
@@ -259,7 +264,8 @@
 		onMounted
 	} from 'vue';
 	import {
-		onLoad
+		onLoad,
+		onReachBottom
 	} from '@dcloudio/uni-app'
 	import {
 		useCounterStore
@@ -280,40 +286,7 @@
 	const statuValue = ref('请选择')
 	const useStatus = ref('')
 	const useStatusList = reactive([
-		[{
-			value: '待确认',
-			id: 0
-		}, {
-			value: '已确认',
-			id: 1
-		}, {
-			value: '已拒绝',
-			id: 2
-		}, {
-			value: '已退回',
-			id: 3
-		}, {
-			value: '作废',
-			id: '-1'
-		}, {
-			value: '红冲',
-			id: '-2'
-		}, {
-			value: '开票流程',
-			id: 100
-		}, {
-			value: '作废流程中',
-			id: 200
-		}, {
-			value: '作废待确认',
-			id: 2000
-		}, {
-			value: '红冲流程中',
-			id: 300
-		}, {
-			value: '红冲待确认',
-			id: 3000
-		}]
+		[]
 	]);
 	const user = ref('')
 	user.value = store.userInfo.name
@@ -326,13 +299,21 @@
 	const proshow = ref(false)
 	const projInvoiceSubs = ref([])
 	const proIndex = ref(0)
+	const inEntName = ref('')
+	const csrCustomerCode = ref('')
+	const csrAddress = ref('')
+	const csrPhone = ref('')
+	const invoiceName = ref('')
+	const invoiceTel = ref('')
+	const invoicePhone = ref('')
+	const bankAccount = ref('')
+	const bankType = ref('')
+	const invoiceEmail = ref('')
+	const recPrice = ref('')
+	const pageIndex = ref(1)
+	const total = ref(0)
 
-
-
-
-
-
-
+	const ListData = ref([])
 	const list = reactive([{
 			name: '发起提交'
 		},
@@ -398,12 +379,57 @@
 		// deptList1[0] = store.userInfo.deptList || []; // 赋值给响应式数组
 	});
 	onLoad((e) => {
-		if (e) {
+		getlistData();
+		getProcessList();
+		if (e.sysNo) {
 			console.log(e.sysNo)
 			contractDetile(e.sysNo)
 			// contractData.value = JSON.parse(e.item)
 		}
 	})
+	onReachBottom(() => {
+		getlistData();
+
+	})
+	// 流程列表
+	const getProcessList = () => {
+		// 流程列表
+		API_getStartProcessList({
+			category: 'invoice'
+		}).then(res => {
+			console.log(res)
+			useStatusList[0] = res.data
+			console.log(res.data[0].definitionId)
+			useStatus.value = res.data[0].definitionId
+			statuValue.value = res.data[0].processName
+			console.log(useStatus.value)
+		})
+	}
+	// 列表
+	const getlistData = () => {
+
+		API_ProjInvoicePage({
+			search: keyword.value,
+			type: 1,
+			pageSize: 10,
+			pageIndex: pageIndex.value
+		}).then(res => {
+			console.log(res)
+			if (res.data.records.length == 0) {
+				ListData.value = []
+			}
+			if (ListData.value.length != 0 && ListData.value.length >= total.value)
+				return;
+			if (pageIndex == 1) {
+				ListData.value = res.data.records;
+			} else {
+				ListData.value = ListData.value.concat(res.data.records);
+			}
+			total.value = total;
+			pageIndex.value++;
+			console.log(ListData.value)
+		})
+	}
 	// 选择产品
 	const proTap = (index) => {
 		console.log(index)
@@ -416,7 +442,7 @@
 			sysNo: sysNo
 		}).then(res => {
 			contractData.value = res.data
-			console.log(contractData.value.projContractServer)
+			console.log(contractData.value)
 		})
 	}
 	// 删除产品
@@ -427,7 +453,8 @@
 	const addprod = () => {
 		let obj = {
 			proServeName: "",
-			invoicePrice: ""
+			recPrice: "",
+			projServerSysNo: ""
 		}
 		prodList.value.push({
 			...obj
@@ -452,12 +479,12 @@
 		console.log(e)
 
 		prodList.value[proIndex.value].proServeName = e.value[0].proServeName
-		prodList.value[proIndex.value].invoicePrice = e.value[0].invoicePrice
+		prodList.value[proIndex.value].recPrice = e.value[0].invoicePrice
 		prodList.value[proIndex.value].projServerSysNo = e.value[0].projServerSysNo
 		// entDeptSysNo.value = e.value[0].sysNo
 		// entDeptName.value = e.value[0].name
 		proshow.value = false
-		
+
 		console.log(prodList.value)
 	}
 	const deptconfirm = (e) => {
@@ -468,16 +495,61 @@
 	}
 	const statusconfirm = (e) => {
 		console.log(e.value[0].value)
-		useStatus.value = e.value[0].id
-		statuValue.value = e.value[0].value
+		useStatus.value = e.value[0].definitionId
+		statuValue.value = e.value[0].processName
 		statusshow.value = false
 	}
 
 	// 新增
 	const addData = () => {
-		if (!useStatus.value) return uni.$u.toast('请选择开票流程')
-		API_invoiceApplyAdd({}).then(res => {
+		if (!statuValue.value) return uni.$u.toast('请选择开票流程')
+		if (!contractData.value.code) return uni.$u.toast('请选择合同')
+		let prosf;
+		if (prodList.value.length > 0) {
+			prosf = prodList.value.some((item) => {
+				return item.proServeName !== '';
+			});
+			// console.log(prosf);
+		}
+		// console.log(prosf);
+		if (!prosf) return uni.$u.toast('请选择产品')
+		if (!prodList.value.length) return uni.$u.toast('请选择合同')
+		// console.log(contractData.code)
+		let inType;
+		if (tabIndex.value == 0) {
+			inType = 1
+		} else {
+			inType = 2
+		}
+		if (!inEntName.value) return uni.$u.toast('请输入企业名称')
+		if (!csrCustomerCode.value) return uni.$u.toast('请输入税号')
+		if (!invoiceName.value) return uni.$u.toast('请输入开票公司')
+		if (!invoiceEmail.value) return uni.$u.toast('请输入开票邮箱')
+		if (!recPrice.value) return uni.$u.toast('请输入开票金额')
+		let obj = {
+			inType: inType,
+			entDeptName: entDeptName.value,
+			workFlowSysNo: useStatus.value,
+			user: user.value,
 
+			projContractSysNo: contractData.value.sysNo,
+			projInvoiceSubs: prodList.value,
+			inEntName: inEntName.value,
+			csrCustomerCode: csrCustomerCode.value,
+			csrAddress: csrAddress.value,
+			csrPhone: csrPhone.value,
+			invoiceName: invoiceName.value,
+			invoiceTel: invoiceTel.value,
+			invoicePhone: invoicePhone.value,
+			bankAccount: bankAccount.value,
+			bankType: bankType.value,
+			invoiceEmail: invoiceEmail.value,
+			recPrice: recPrice.value,
+		}
+		console.log(obj)
+		API_invoiceApplyAdd(obj).then(res => {
+			uni.$u.toast('提交成功')
+			getlistData()
 		})
 	}
 	// 选择合同

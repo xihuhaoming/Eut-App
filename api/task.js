@@ -60,5 +60,17 @@ export function API_contracthDetail(params) {
 }
 // 开票
 export function API_invoiceApplyAdd(params) {
-	return post('/invoiceApply/add', params)
+	return post('/projApi/project/ProjInvoice/add', params)
+}
+// 开票列表
+export function API_ProjInvoicePage(params) {
+	return get('/projApi/project/ProjInvoice/page', {params})
+}
+// 开票流程列表
+export function API_getStartProcessList(params) {
+	return get('/workflow/process/getStartProcessList', {params})
+}
+// 新增报销
+export function API_finApitranslateadd(params) {
+	return post('/finApi/fin/translate/add', params)
 }

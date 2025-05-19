@@ -187,6 +187,9 @@
 
 <script setup>
 	import {
+		API_finApitranslateadd
+	} from '/api/task.js'
+	import {
 		ref,
 		reactive,
 		onMounted
