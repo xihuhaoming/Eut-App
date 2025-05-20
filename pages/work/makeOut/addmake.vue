@@ -43,7 +43,7 @@
 				<block v-for="(item,index) in prodList" :key="index">
 					<view class="card up-m-t-20">
 						<up-cell-group :border="false">
-							<up-cell title="产品" :value="prodList[index].proServeName" :isLink="true" arrow-direction="right"
+							<up-cell title="产品" :value="prodList[index].projServerName" :isLink="true" arrow-direction="right"
 								:required="true" @click="proTap(index)"></up-cell>
 							<up-cell title="开票金额" :value="prodList[index].recPrice" :isLink="false" arrow-direction="right"
 								:required="true"></up-cell>
@@ -147,7 +147,7 @@
 		<view class="content1" v-if="tabIndex == 1">
 			<view class="up-p-t-20" style="background:#ffffff;">
 				<up-search class="up-m-b-20" placeholder="请输入查找内容" v-model="keyword" :showAction="false" bgColor="#F6F8FC"
-					height="40" @search="getlistData()"></up-search>
+					height="40" @search="getlistData(1)"></up-search>
 				<view class="u-flex filter u-col-center u-row-around">
 					<!-- 时间 -->
 					<up-dropdown ref="uDropdownRef" border-radius="20">
@@ -159,45 +159,29 @@
 								</view>
 								<view class="slotCon up-flex up-text-center u-row-around up-p-t-40 up-p-b-40">
 									<view class="timeBtn" @click="chongzTime">重置</view>
-									<view class="timeBtn2" @click="SubmitTime">确认</view>
+									<view class="timeBtn2" @click="SubmitTime(0)">确认</view>
 								</view>
 								<!-- <up-button type="primary" @click="closeDropdown">时间</up-button> -->
 							</view>
 						</up-dropdown-item>
 						<!-- 类型 -->
-						<up-dropdown-item title="类型">
+						<up-dropdown-item title="状态">
 							<view class="slot-content up-p-l-25 up-p-r-25">
 								<view class="slotCon up-text-center up-content-color up-p-t-40 up-p-b-40">
 									<!-- 任务 -->
 									<view class="typeTitle u-flex u-col-center ">
 										<view class="ttleft up-m-r-20"></view>
-										<view class="ttright">任务&通知</view>
+										<view class="ttright">状态</view>
 									</view>
 									<hy-btn-group class="up-m-t-30 up-m-l-20" :list="workList0" v-model="workValue0"
-										@itemClick="itemClick1" multiple
+										@itemClick="itemClick1" :multiple='false'
 										:unSelectedStyle="{background: '#F5F7FB',color: '#5A78A0',borderColor: '#F5F7FB'}"
 										:selectedStyle="{background: '#ECF1FF',color: '#3C82FE',borderColor: '#ECF1FF'}"></hy-btn-group>
-									<!-- 工作组名称 -->
-									<view class="typeTitle u-flex u-col-center up-m-t-30">
-										<view class="ttleft1 up-m-r-20"></view>
-										<view class="ttright">工作组名称</view>
-									</view>
-									<hy-btn-group class="up-m-t-30 up-m-l-20" :list="workList" v-model="workValue" @itemClick="itemClick1"
-										multiple :unSelectedStyle="{background: '#F5F7FB',color: '#5A78A0',borderColor: '#F5F7FB'}"
-										:selectedStyle="{background: '#ECF1FF',color: '#3C82FE',borderColor: '#ECF1FF'}"></hy-btn-group>
-									<!-- 工作组名称 -->
-									<view class="typeTitle u-flex u-col-center up-m-t-30">
-										<view class="ttleft1 up-m-r-20"></view>
-										<view class="ttright">工作组名称</view>
-									</view>
-									<hy-btn-group class="up-m-t-30 up-m-l-20" :list="workList2" v-model="workValue2"
-										@itemClick="itemClick1" multiple
-										:unSelectedStyle="{background: '#F5F7FB',color: '#5A78A0',borderColor: '#F5F7FB'}"
-										:selectedStyle="{background: '#ECF1FF',color: '#3C82FE',borderColor: '#ECF1FF'}"></hy-btn-group>
+
 								</view>
 								<view class="slotCon up-flex up-text-center u-row-around up-p-t-40 up-p-b-40">
 									<view class="timeBtn" @click="chongzTime">重置</view>
-									<view class="timeBtn2" @click="SubmitTime">确认</view>
+									<view class="timeBtn2" @click="SubmitTime(1)">确认</view>
 								</view>
 								<!-- <up-button type="primary" @click="closeDropdown">时间</up-button> -->
 							</view>
@@ -205,9 +189,9 @@
 					</up-dropdown>
 				</view>
 			</view>
-			<view class="taskbox">
+			<view class="taskbox" v-if="ListData?.length">
 				<block v-for="(item,index) in ListData" :key="index">
-					<view class="taskItem up-m-t-20">
+					<view class="taskItem up-m-t-20" @click="detailnav(item.sysNo)">
 						<view class="titemTop u-flex u-row-between up-p-b-15">
 							<view class="ttleft u-flex u-col-center">
 								<image src="/static/work/time.png"></image>
@@ -229,7 +213,7 @@
 					</view>
 				</block>
 			</view>
-
+			<up-empty v-else class="up-m-t-50" mode="list" icon="/static/ques.png"></up-empty>
 
 		</view>
 		<!-- 选择产品 -->
@@ -285,6 +269,7 @@
 	const statusshow = ref(false)
 	const statuValue = ref('请选择')
 	const useStatus = ref('')
+	const workFlowSysNo = ref('')
 	const useStatusList = reactive([
 		[]
 	]);
@@ -330,42 +315,23 @@
 		value: 2
 	}]);
 	const workList0 = reactive([{
-		label: '任务',
-		value: 1
-	}, {
-		label: '通知',
-		value: 2
-	}]);
+			label: '待确认',
+			value: 0
+		}, {
+			label: '已确认',
+			value: 1
+		},
+		{
+			label: '已拒绝',
+			value: 2
+		},
+		{
+			label: '开票流程中',
+			value: 100
+		},
+	]);
 	const name = ref('')
 	const textValue = ref('')
-	const workList = reactive([{
-			label: '采购流程',
-			value: 1
-		}, {
-			label: '入库流程',
-			value: 2
-		},
-		{
-			label: '合同流程',
-			value: 3
-		},
-		{
-			label: '工作流流程',
-			value: 4
-		},
-	]);
-	const workList2 = reactive([{
-			label: '采购流程',
-			value: 1
-		}, {
-			label: '入库流程',
-			value: 2
-		},
-		{
-			label: '合同流程',
-			value: 3
-		}
-	]);
 	const workValue0 = reactive([])
 	const workValue = reactive([])
 	const workValue2 = reactive([])
@@ -379,7 +345,7 @@
 		// deptList1[0] = store.userInfo.deptList || []; // 赋值给响应式数组
 	});
 	onLoad((e) => {
-		getlistData();
+
 		getProcessList();
 		if (e.sysNo) {
 			console.log(e.sysNo)
@@ -388,9 +354,16 @@
 		}
 	})
 	onReachBottom(() => {
-		getlistData();
+		if (tabIndex.value == 1) {
+			getlistData();
+		}
 
 	})
+	const detailnav = (sysNo) => {
+		uni.navigateTo({
+			url: "/pages/work/makeOut/makeDetile?sysNo=" + sysNo
+		})
+	}
 	// 流程列表
 	const getProcessList = () => {
 		// 流程列表
@@ -400,33 +373,42 @@
 			console.log(res)
 			useStatusList[0] = res.data
 			console.log(res.data[0].definitionId)
-			useStatus.value = res.data[0].definitionId
+			workFlowSysNo.value = res.data[0].definitionId
 			statuValue.value = res.data[0].processName
-			console.log(useStatus.value)
+			console.log(workFlowSysNo.value)
 		})
 	}
 	// 列表
-	const getlistData = () => {
-
+	const getlistData = (type) => {
+		if (type == 1) {
+			ListData.value = []
+			pageIndex.value = 1
+		}
 		API_ProjInvoicePage({
+			startDate: startTime.value,
+			endDate: endTime.value,
+			useStatus: useStatus.value,
 			search: keyword.value,
 			type: 1,
 			pageSize: 10,
 			pageIndex: pageIndex.value
 		}).then(res => {
 			console.log(res)
-			if (res.data.records.length == 0) {
+			if (res.data.records.length == 0 && res.data.total == 0) {
 				ListData.value = []
-			}
-			if (ListData.value.length != 0 && ListData.value.length >= total.value)
-				return;
-			if (pageIndex == 1) {
-				ListData.value = res.data.records;
+				pageIndex.value = 1
 			} else {
-				ListData.value = ListData.value.concat(res.data.records);
+				if (ListData.value.length != 0 && ListData.value.length >= res.data.total)
+					return;
+				if (pageIndex == 1) {
+					ListData.value = res.data.records;
+				} else {
+					ListData.value = ListData.value.concat(res.data.records);
+				}
+				total.value = total;
+				pageIndex.value++;
 			}
-			total.value = total;
-			pageIndex.value++;
+
 			console.log(ListData.value)
 		})
 	}
@@ -452,7 +434,7 @@
 	// 添加产品
 	const addprod = () => {
 		let obj = {
-			proServeName: "",
+			projServerName: "",
 			recPrice: "",
 			projServerSysNo: ""
 		}
@@ -478,7 +460,7 @@
 	const proconfirm = (e) => {
 		console.log(e)
 
-		prodList.value[proIndex.value].proServeName = e.value[0].proServeName
+		prodList.value[proIndex.value].projServerName = e.value[0].proServeName
 		prodList.value[proIndex.value].recPrice = e.value[0].invoicePrice
 		prodList.value[proIndex.value].projServerSysNo = e.value[0].projServerSysNo
 		// entDeptSysNo.value = e.value[0].sysNo
@@ -495,7 +477,7 @@
 	}
 	const statusconfirm = (e) => {
 		console.log(e.value[0].value)
-		useStatus.value = e.value[0].definitionId
+		workFlowSysNo.value = e.value[0].definitionId
 		statuValue.value = e.value[0].processName
 		statusshow.value = false
 	}
@@ -507,7 +489,7 @@
 		let prosf;
 		if (prodList.value.length > 0) {
 			prosf = prodList.value.some((item) => {
-				return item.proServeName !== '';
+				return item.projServerName !== '';
 			});
 			// console.log(prosf);
 		}
@@ -529,7 +511,7 @@
 		let obj = {
 			inType: inType,
 			entDeptName: entDeptName.value,
-			workFlowSysNo: useStatus.value,
+			workFlowSysNo: workFlowSysNo.value,
 			user: user.value,
 
 			projContractSysNo: contractData.value.sysNo,
@@ -545,11 +527,14 @@
 			bankType: bankType.value,
 			invoiceEmail: invoiceEmail.value,
 			recPrice: recPrice.value,
+			invoiceRemarks:textValue.value
 		}
 		console.log(obj)
 		API_invoiceApplyAdd(obj).then(res => {
 			uni.$u.toast('提交成功')
-			getlistData()
+			setTimeout(() => {
+				getlistData()
+			}, 500)
 		})
 	}
 	// 选择合同
@@ -566,6 +551,9 @@
 	const tabclick = (e) => {
 		console.log(e)
 		tabIndex.value = e.index
+		if (tabIndex.value == 1) {
+			getlistData();
+		}
 	}
 	// 关闭筛选框
 	const closeDropdown = () => {
@@ -575,6 +563,7 @@
 	// 选择类型
 	const itemClick1 = (e) => {
 		console.log(e)
+		useStatus.value = e.val
 	}
 	// 选择时间
 	const timeTan = (e) => {
@@ -602,14 +591,33 @@
 		workValue2.length = 0;
 	}
 	// 时间确定
-	const SubmitTime = () => {
-		uDropdownRef.value.close()
-		workValue0.length = 0;
-		workValue.length = 0;
-		workValue2.length = 0;
-		startTime.value = "开始时间";
-		endTime.value = "结束时间";
-
+	const SubmitTime = (type) => {
+		if (type == 0) {
+			if (startTime.value == "开始时间") {
+				uni.$u.toast('请选择开始时间')
+				return
+			}
+			if (endTime.value == "结束时间") {
+				uni.$u.toast('请选择结束时间')
+				return
+			}
+			uDropdownRef.value.close()
+			pageIndex.value = 1
+			getlistData();
+			startTime.value = "开始时间";
+			endTime.value = "结束时间";
+		} else {
+			if (startTime.value == "开始时间") {
+				startTime.value = ''
+			}
+			if (endTime.value == "结束时间") {
+				endTime.value = ''
+			}
+			uDropdownRef.value.close()
+			pageIndex.value = 1
+			getlistData();
+			workValue0.length = 0;
+		}
 	}
 	// 转换时间戳
 	const formatTimestamp = (timestamp) => {

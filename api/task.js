@@ -70,6 +70,10 @@ export function API_ProjInvoicePage(params) {
 export function API_getStartProcessList(params) {
 	return get('/workflow/process/getStartProcessList', {params})
 }
+// 开票详情
+export function API_ProjInvoicedetail(params) {
+	return get('/projApi/project/ProjInvoice/detail', {params})
+}
 // 新增报销
 export function API_finApitranslateadd(params) {
 	return post('/finApi/fin/translate/add', params)
