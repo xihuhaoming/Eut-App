@@ -14,6 +14,7 @@ export const useCounterStore = defineStore('counter', {
 			},
 			pageSize: 10,
 			UPLOADURL: `${APIURL}/common/upload`, //上传地址
+			ProcessList:[],//流程List
 		}
 	},
 	// 也可以定义为
@@ -25,6 +26,11 @@ export const useCounterStore = defineStore('counter', {
 				this.userInfo = e;
 			}
 		},
+		setProcessList(e){
+			if(e){
+				this.ProcessList = e;
+			}
+		}
 	},
 	persist: true
 })

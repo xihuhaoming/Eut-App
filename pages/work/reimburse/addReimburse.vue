@@ -10,9 +10,9 @@
 			</view>
 			<view class="card">
 				<up-cell-group :border="false">
-					<up-cell title="申请部门" value="易尤特集团" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-					<up-cell title="报销流程" value="易尤特集团" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-					<up-cell title="办理人" value="易尤特集团" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+					<up-cell title="申请部门" :value="entDeptName" :isLink="true" arrow-direction="right" :required="true"></up-cell>
+					<up-cell title="报销流程" :value="statuValue" :isLink="true" arrow-direction="right" :required="true"></up-cell>
+					<up-cell title="办理人" :value="user" :isLink="false" arrow-direction="right" :required="false"></up-cell>
 					<up-cell @click="lxshow = true" title="报销类型" :value="lxValue" :isLink="true" arrow-direction="right"
 						:required="true"></up-cell>
 					<!-- 报销类型选择 -->
@@ -194,14 +194,31 @@
 		reactive,
 		onMounted
 	} from 'vue';
-
+	import {
+		useCounterStore
+	} from '/store/counter';
+	const store = useCounterStore();
+	const useStatusList = ref([])
+	const workFlowSysNo = ref('')
+	const statuValue = ref('')
+	const user = ref('')
+	useStatusList[0] = store.ProcessList
+	// console.log(res.data[0].definitionId)
+	// workFlowSysNo.value = store.ProcessList[0].definitionId
+	// statuValue.value = store.ProcessList[0].processName
+	
+	user.value = store.userInfo.name
 	const lxshow = ref(false);
 	const columns = reactive([
 		['油卡', '办公用品']
 	]);
 	const lxValue = ref("")
+	const entDeptName = ref('')
+	const entDeptSysNo = ref('')
 	const tabIndex = ref(0)
 	const keyword = ref("")
+	entDeptName.value = store.userInfo.deptList[0].name
+	entDeptSysNo.value = store.userInfo.deptList[0].sysNo
 	const list = reactive([{
 			name: '发起提交'
 		},

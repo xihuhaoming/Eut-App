@@ -18,12 +18,21 @@
 </template>
 
 <script setup>
-
+	import {
+		API_getStartProcessList
+	} from '/api/task.js'
 	import {
 		ref,
 		reactive,
 		onMounted
 	} from 'vue';
+	import {
+		onLoad
+	} from '@dcloudio/uni-app'
+	import {
+		useCounterStore
+	} from '../../store/counter';
+	const store = useCounterStore();
 	const list = reactive([{
 			title: "日常",
 			arr: [{
@@ -93,9 +102,27 @@
 			]
 		},
 	])
+	onLoad(()=>{
+		getProcessList();
+	})
 	const navTap = (url) => {
 		uni.navigateTo({
 			url: url
+		})
+	}
+	// 流程列表
+	const getProcessList = () => {
+		// 流程列表
+		API_getStartProcessList({
+			category: 'invoice'
+		}).then(res => {
+			store.setProcessList(res.data)
+			console.log('工作台工作流程',res)
+			// useStatusList[0] = res.data
+			// console.log(res.data[0].definitionId)
+			// workFlowSysNo.value = res.data[0].definitionId
+			// statuValue.value = res.data[0].processName
+			// console.log(workFlowSysNo.value)
 		})
 	}
 </script>
