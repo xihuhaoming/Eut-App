@@ -17,9 +17,8 @@ Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN�
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1. 在uni_modules/uview-plus目录下安装npm install
+2. 根目录执行npm i pinia-plugin-persistedstate
 
 #### 参与贡献
 
