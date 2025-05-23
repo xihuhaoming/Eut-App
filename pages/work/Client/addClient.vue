@@ -3,6 +3,7 @@
 		<up-navbar title="客户" :placeholder="true" :autoBack="true" />
 		<view style="background:#fff;">
 			<up-tabs :scrollable="false" :list="list" @click="tabclick"
+				style="position: fixed; top: 30px; left: 0; right: 0; z-index: 1000; background: #fff;"
 				itemStyle="padding:0 50rpx; height: 34rpx; margin:30rpx 0;" inactiveStyle="font-size: 28rpx;color: #B7C4D7;"
 				activeStyle="color: #092D5C;font-size:30rpx"></up-tabs>
 		</view>
@@ -93,12 +94,10 @@
 						</view>
 					</view>
 				</view>
-				<up-cell-group :border="false"><up-cell title="负责人" value="默认自己" :isLink="false" arrow-direction="right"
+				<up-cell-group :border="false"><up-cell title="负责人" :value="form.inUserName" :isLink="false" arrow-direction="right"
 						:required="true">
 					</up-cell>
-					<up-cell title="客户来源" value="默认自己" :isLink="false" arrow-direction="right" :required="true">
-					</up-cell>
-					<up-cell title="意向项目类别" value="默认自己" :isLink="false" arrow-direction="right" :required="true">
+					<up-cell title="客户来源" :value="form.customerSource" :isLink="false" @click="showCustomerSourcePicker = true" arrow-direction="right" :required="true">
 					</up-cell>
 					<up-cell title="客户类型" value="默认自己" :isLink="false" arrow-direction="right" :required="true">
 					</up-cell>
@@ -221,12 +220,12 @@
 
 		<!-- Pickers -->
 		<up-picker :show="showRegionPicker" :columns="regionOptions" @confirm="confirmRegion" @cancel="showRegionPicker = false" title="选择地区"></up-picker>
-		<up-picker :show="showUserPicker" :columns="userOptions" keyName="name" @confirm="confirmUser" @cancel="showUserPicker = false" title="选择负责人"></up-picker>
+		<up-picker :show="showUserPicker" :columns="userOptions" keyName="name"  @confirm="confirmUser" @cancel="showUserPicker = false" title="选择负责人"></up-picker>
 		<up-picker :show="showLevelPicker" :columns="levelOptions" @confirm="confirmLevel" @cancel="showLevelPicker = false" title="选择客户等级"></up-picker>
 		<up-picker :show="showCustomerTypePicker" :columns="customerTypeOptions" @confirm="confirmCustomerType" @cancel="showCustomerTypePicker = false" title="选择客户类型"></up-picker>
 		<up-picker :show="showCompanyTypePicker" :columns="companyTypeOptions" @confirm="confirmCompanyType" @cancel="showCompanyTypePicker = false" title="选择公司类型"></up-picker>
 		<!-- Mock Pickers for fields not in API, can be removed if not needed -->
-		<up-picker :show="showCustomerSourcePicker" :columns="customerSourceOptions" @confirm="confirmCustomerSource" @cancel="showCustomerSourcePicker = false" title="选择客户来源"></up-picker>
+		<up-picker :show="showCustomerSourcePicker" :columns="customerSourceOptions" keyName="label" @confirm="confirmCustomerSource" @cancel="showCustomerSourcePicker = false" title="选择客户来源"></up-picker>
 		<up-picker :show="showProjectCategoryPicker" :columns="projectCategoryOptions" @confirm="confirmProjectCategory" @cancel="showProjectCategoryPicker = false" title="选择意向项目类别"></up-picker>
 	</view>
 </template>
@@ -286,7 +285,6 @@
 		// Fields from UI but not directly in API root for client:
 		customerSource: '', // 客户来源 - For UI example
 		projectCategoryInterest: '', // 意向项目类别 - For UI example
-		labels: [], // 用于存储客户标签
 	});
 
 	const form = reactive(initialFormState());
@@ -324,9 +322,26 @@
 			{ label: '政府侧', value: '1' }
 		]
 	]);
-    // Mock pickers for UI consistency, can be removed if not mapping to API
-    const showCustomerSourcePicker = ref(false);
-    const customerSourceOptions = ref([[{label: '来源A', value: 'SRC_A'}, {label: '来源B', value: 'SRC_B'}]]);
+
+	import { API_getDictType } from '@/api/client';
+	const showCustomerSourcePicker = ref(false);
+    const customerSourceOptions = ref([[]]);
+	const API_getDictTypeData = async () => {
+		const params = {
+			dictType: "intention_source",
+		};
+		const res = await API_getDictType(params)
+		customerSourceOptions.value = [res.data.map(item => ({
+			label: item.dictLabel,
+			value: item.dictValue
+		}))];
+	}
+
+	onLoad(() => {
+		API_getDictTypeData()
+	})
+    
+	
     const showProjectCategoryPicker = ref(false);
     const projectCategoryOptions = ref([[{label: '项目X', value: 'PROJ_X'}, {label: '项目Y', value: 'PROJ_Y'}]]);
 
@@ -368,14 +383,14 @@
 				// clientTagInputValue.value = newTag; // 保留输入内容
 				return false;
 			}
-			if (form.labels.includes(newTag)) {
+			if (form.label.includes(newTag)) {
 				uni.showToast({ title: '标签已存在', icon: 'none' });
 				// clientTagInputValue.value = ''; // 清空重复的输入
 				// showClientTagInput.value = true; // 保持输入状态
 				return false;
 			}
-			if (form.labels.length < maxClientTags.value) {
-				form.labels.push(newTag);
+			if (form.label.length < maxClientTags.value) {
+				form.label.push(newTag);
 				updateLabelName(); 
 			} else {
 				uni.showToast({ title: `最多添加 ${maxClientTags.value} 个标签`, icon: 'none' });
@@ -402,12 +417,12 @@
 	};
 	
 	const removeClientTag = (index) => {
-		form.labels.splice(index, 1);
+		form.label.splice(index, 1);
 		updateLabelName();
 	};
 
 	const updateLabelName = () => {
-		form.labelName = form.labels.join(','); 
+		form.labelName = form.label.join(','); 
 	};
 
 	const onKeyboardHeightChange = (e) => {
@@ -444,7 +459,9 @@
 		showCompanyTypePicker.value = false;
 	};
     const confirmCustomerSource = (e) => {
-        form.customerSource = e.value[0].label; // Or value, depending on needs
+		if (e.value && e.value.length > 0) {
+			form.customerSource = e.value[0].label; // 直接取用 keyName 对应的显示值
+		}
         showCustomerSourcePicker.value = false;
     };
     const confirmProjectCategory = (e) => {
@@ -480,6 +497,9 @@
 		tabIndex.value = e.index
 	}
 
+
+	
+
 </script>
 
 <style setup lang="scss">
@@ -502,6 +522,7 @@
 
 	.content {
 		padding: 30rpx;
+		padding-top: 120rpx;
 	}
 
 	.card {
@@ -607,6 +628,7 @@
 	.tag-input-container {
 	  // 可以保持之前的样式，或者根据页面整体风格调整
 	  border-bottom: 1px solid #f0f0f0;	
+	  padding-bottom: 20rpx;
 	}
 
 	.tag-list {
@@ -627,13 +649,13 @@
 	.tag-input-wrapper {
 	  display: inline-flex; // 使得input和button在同一行
 	  // align-items: center; // 垂直居中（如果需要）
-	  min-width: 172rpx; // 尝试保持最小宽度与按钮一致
+	  min-width: 150rpx; // 尝试保持最小宽度与按钮一致
 	  padding: 0 10rpx;
 	}
 
 	.bqadd-input {
-	  height: 68rpx; // 保持和 .bqadd 一样的高度
-	  line-height: 68rpx;
+	  height: 66rpx; // 保持和 .bqadd 一样的高度
+	  line-height: 66rpx;
 	  padding: 0 20rpx;
 	  border-radius: 6rpx;
 	  border: 2rpx dashed #3C82FE; // 保持和 .bqadd 一样的边框
@@ -641,7 +663,7 @@
 	  color: #3C82FE;
 	  background-color: #fff; // 通常输入框背景为白色
 	  text-align: center; // 保持和 .bqadd 一样的文本对齐
-	  width: 150rpx;
+	  width: 130rpx;
 	}
 
 	.close-icon-wrapper {

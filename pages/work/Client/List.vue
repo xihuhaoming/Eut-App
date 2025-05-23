@@ -9,6 +9,7 @@
 
 		</up-navbar>
 		<up-tabs :scrollable="false" :list="list" @click="tabclick"
+			
 			itemStyle="padding:0 50rpx; height: 34rpx; margin:30rpx 0; " inactiveStyle="font-size: 28rpx;color: #B7C4D7;"
 			activeStyle="color: #092D5C;font-size:30rpx"></up-tabs>
 
