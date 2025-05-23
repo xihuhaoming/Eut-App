@@ -22,7 +22,7 @@
 
 			<view class="u-flex u-row-between u-col-center">
 				<view class="xtitle bold">实物产品</view>
-				<view class="u-flex u-col-center">
+				<view class="u-flex u-col-center" @click="addProductClick">
 					<view class="up-m-r-10" style="font-size: 26rpx;color: #B7C4D7;">添加产品</view>
 					<up-icon name="plus-circle" size="20px" color="#5A78A0"></up-icon>
 				</view>
@@ -297,6 +297,12 @@
 		const month = String(date.getMonth() + 1).padStart(2, '0');
 		const day = String(date.getDate()).padStart(2, '0');
 		return `${year}-${month}-${day}`;
+	}
+	// 添加产品
+	const addProductClick = () => {
+		uni.navigateTo({
+			url: '/pages/work/drawOn/addProduct'
+		})
 	}
 </script>
 

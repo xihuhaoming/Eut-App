@@ -1,11 +1,11 @@
 <template>
 	<view>
-		<up-navbar title="物资管理" :placeholder="true" :autoBack="true" />
+		<up-navbar :title="type===chooseMaterial? '物资管理':'选择实物产品'" :placeholder="true" :autoBack="true" />
 
 		<up-search class="up-m-b-20 up-m-t-20" placeholder="请输入查找内容" v-model="keyword" :showAction="false" bgColor="#F6F8FC"
 			height="40"></up-search>
 		<up-dropdown>
-			<up-dropdown-item v-model="value1" title="距离" :options="options1"></up-dropdown-item>
+			<up-dropdown-item v-model="value1" title="一级" :options="options1"></up-dropdown-item>
 			<up-dropdown-item v-if="value1" v-model="value2" title="温度" :options="options2"></up-dropdown-item>
 		</up-dropdown>
 		<view class="content">
@@ -16,6 +16,9 @@
 					<view class="meTop2 up-m-t-10">793493749</view>
 					<view class="meBot up-m-t-30">单价：739250.00</view>
 					<view class="meBot2 up-m-t-10">总价值：739250.00</view>
+				</view>
+				<view class="up-m-l-20">
+					<up-button type="primary" size="mini" class="select-btn">选择</up-button>
 				</view>
 			</view>
 		</view>
@@ -28,6 +31,28 @@
 		reactive,
 		onMounted
 	} from 'vue';
+	import { getMaterialList } from '@/api/material'
+	import {
+		onLoad
+	} from '@dcloudio/uni-app'
+
+	const type = ref('')
+	onLoad((e) => {
+		type.value = e.type
+		console.log(type.value)
+		getMaterialListData()
+	})
+	
+	// 获取物资列表
+	const getMaterialListData = async () => {
+		const res = await getMaterialList({
+			page: 1,
+			pageSize: 10
+		})
+		console.log(res)
+	}
+	
+	
 	const options1 = reactive([{
 			label: '默认排序',
 			value: 1,

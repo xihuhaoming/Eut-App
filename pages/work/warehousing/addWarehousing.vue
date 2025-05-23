@@ -1,18 +1,19 @@
 <template>
 	<view>
 		<up-navbar title="入库" :placeholder="true" :autoBack="true" />
-		<up-tabs :scrollable="false" :list="list" @click="tabclick"
+		<up-tabs :scrollable="false" :list="list" @click="tabclick" 
+			style="position: fixed; top: 44px; left: 0; right: 0; z-index: 1000; background-color: #fff; width: auto; display: flex; justify-content: center; align-items: center; height: auto;"
 			itemStyle="padding:0 50rpx; height: 34rpx; margin:30rpx 0;" inactiveStyle="font-size: 28rpx;color: #B7C4D7;"
 			activeStyle="color: #092D5C;font-size:30rpx"></up-tabs>
 		<view class="content" v-if="tabIndex==0">
 			<view class="card">
 				<up-cell-group :border="false">
-					<up-cell title="申请人" value="默认自己" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-					<up-cell title="入库流程" value="选择的流程" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-					<up-cell title="办理人" value="根据流程显示" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-					<up-cell title="仓库类型" value="选择的供应商" :isLink="true" arrow-direction="right" :required="false"></up-cell>
-					<up-cell title="核验人" value="根据流程显示" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-					<up-cell title="采购单号" value="选择的供应商" :isLink="true" arrow-direction="right" :required="false"></up-cell>
+					<up-cell title="申请人" :value="form.createUserName" :isLink="true" arrow-direction="right" :required="true"></up-cell>
+					<up-cell title="入库流程" :value="form.workFlowName || '选择的流程'" :isLink="true" @click="getStartProcessListClick" arrow-direction="right" :required="true"></up-cell>
+					<!-- <up-cell title="办理人" value="根据流程显示" :isLink="true" arrow-direction="right" :required="true"></up-cell> -->
+					<up-cell title="仓库类型" :value="form.cklx || '选择的仓库类型'" :isLink="true" @click="showWarehouseTypePickerClick" arrow-direction="right" :required="true"></up-cell>
+					<up-cell title="核验人" :value="form.acceptanceUserName || '根据流程显示'" :isLink="true" @click="showAcceptanceUserPickerClick" arrow-direction="right" :required="true"></up-cell>
+					<up-cell title="采购单号" :value="form.proPurchaseSysNo || '选择的采购单'" :isLink="true" @click="showmyPurchasePickerClick" arrow-direction="right" :required="false"></up-cell>
 
 				</up-cell-group>
 				<!-- 					<view class="textClass up-m-t-20">
@@ -23,7 +24,7 @@
 
 			<view class="u-flex u-row-between u-col-center">
 				<view class="xtitle bold">实物产品</view>
-				<view class="u-flex u-col-center">
+				<view class="u-flex u-col-center" @click="addProductClick">
 					<view class="up-m-r-10" style="font-size: 26rpx;color: #B7C4D7;">添加产品</view>
 					<up-icon name="plus-circle" size="20px" color="#5A78A0"></up-icon>
 				</view>
@@ -163,6 +164,45 @@
 		<up-datetime-picker :minDate="1735660800000" :hasInput="false" class="timeView" hasInput :show="timeshow2"
 			v-model="endTime" mode="date" placeholder="结束时间" @confirm="confirm2"
 			@cancel="timeshow2 = false"></up-datetime-picker>
+		<!-- 流程选择弹窗 -->
+
+		<up-picker
+			:show="showProcessPicker"
+			:columns="processOptions"
+			keyName="name" 
+			@confirm="confirmProcess"
+			@cancel="showProcessPicker = false"
+			title="选择流程"
+		></up-picker>
+
+		<!-- 仓库类型选择弹窗 -->
+		<up-picker
+			:show="showWarehouseTypePicker"
+			:columns="warehouseTypeOptions"
+			@confirm="confirmWarehouseType"
+			@cancel="showWarehouseTypePicker = false"
+			title="选择仓库类型"
+		></up-picker>
+
+
+		<!-- 核验人选择弹窗 -->
+		<!-- <up-picker
+			:show="showAcceptanceUserPicker"
+			:columns="acceptanceUserOptions"
+			@confirm="confirmAcceptanceUser"
+			@cancel="showAcceptanceUserPicker = false"
+			title="选择核验人"
+			keyName="name"
+		></up-picker> -->
+		<!-- 采购单选择弹窗 -->
+		<up-picker
+			:show="showmyPurchasePicker"
+			:columns="[myPurchaseOptions]"
+			keyName="label"
+			@confirm="confirmmyPurchase"
+			@cancel="showmyPurchasePicker = false"
+			title="选择采购单"
+		></up-picker>
 	</view>
 </template>
 
@@ -173,9 +213,16 @@
 		onMounted
 	} from 'vue';
 
+	import { onLoad } from '@dcloudio/uni-app'; // 用于获取页面参数
+	import { addInboundOrder } from '@/api/inbound.js'; // 引入API函数，注意路径是否正确
+	import { getToken } from '@/util/auth.js'; // 用于获取用户信息等
+	import { getStartProcessList } from '@/api/inbound.js'; // 引入API函数，注意路径是否正确
+	import { getPurchaseOrderNumber } from '@/api/inbound.js'; // 引入API函数，注意路径是否正确
+
 	const tabIndex = ref(0)
 	const keyword = ref("")
 	const typeValue = ref(1)
+
 	const list = reactive([{
 			name: '发起提交'
 		},
@@ -183,6 +230,66 @@
 			name: '提交记录'
 		}
 	]);
+	
+
+	const uFormRef = ref(null); // 表单引用
+
+	// --- 新增用于流程选择的数据 ---
+	const showProcessPicker = ref(false);
+	const processOptions = ref([]); // 将由 API 调用填充
+	const selectedProcess = ref(null); 
+
+	// 表单数据模型 (更贴近当前UI和API核心需求)
+	const form = reactive({
+		createUserSysNo: '', // 新增人流水号 (可选, 后端也可能自动填充)
+		createUserName: '',  // 新增人姓名 (可选, 后端也可能自动填充)
+		createInDate: '',    // 新增时间 (可选, 后端也可能自动填充)
+		// sysNo: '', // 流水号 (通常后端生成)
+		// inEntSysNo: '', // 企业流水号 (可能从当前用户或全局配置获取)
+		
+		proSupplierSysNo: '', // 供应商流水号 (如果需要选择供应商)
+		proSupplierName: '',  // 供应商名称 (如果需要选择供应商)
+		
+		inDate: '',          // 入库日期 (必填)
+		inUserSysNo: '',     // 跟单员流水号 (根据选择或流程确定)
+		inUserName: '',      // 跟单员姓名
+		acceptanceUserSysNo: '', // 验收员流水号
+		acceptanceUserName: '',  // 验收员姓名
+		proPurchaseSysNo: '',    // 采购单流水号 (可选)
+		storekeeperUserSysNo: '', // 仓管员流水号
+		storekeeperUserName: '',  // 仓管员姓名
+		remarks: '',         // 备注
+		
+		// --- 工作流相关字段 ---
+		// workMyJobSysNo: '', 
+		// user: '', // 办理人 (可能就是 inUserName 或其他)
+		workFlowSysNo: '', // 工作流流水号
+		// workFlowName: '', // 工作流名称 (用于显示)
+		handlerUserName: '', // 办理人名称 (用于显示)
+
+		// 产品列表
+		proPurchaseEntities: [
+			// 示例:
+			{
+			  proEntityName: '', // 名
+			  code: '',          // UI上目前是静态文本，应改为产品选择后自动填充
+			  price: 0,          // UI上有input
+			  number: 1,         // UI上有数量调整
+			  allPrice: 0,       // 自动计算
+			  // proEntitySysNo: '' // 选择产品后自动填充
+			}
+		],
+
+		// --- 其他业务字段 ---
+		allPrice: 0,         // 总金额 (可以前端计算，也可后端计算)
+		// status: 0, // 状态 (通常由后端管理)
+		// type: '', // 入库类型 (如果需要)
+		cklx: '',            // 仓库类型 (必填)
+		name: '',             // 入库名称 (必填)
+		// flag: '', // 状态 (通常后端管理)
+		// workMyJobFlags: [], // 工作流节点 (通常后端处理或根据选择的流程带出)
+	});
+
 	const typeList = reactive([{
 		label: '增值税普通发票',
 		value: 1
@@ -298,6 +405,114 @@
 		const day = String(date.getDate()).padStart(2, '0');
 		return `${year}-${month}-${day}`;
 	}
+
+
+
+	// 页面加载时，可以尝试获取当前登录用户信息
+	onLoad(async () => {
+		// 假设从本地存储获取用户信息
+		const currentUser = uni.getStorageSync('userInfo'); // 假设用户信息存储在 'userInfo'
+		if (currentUser) {
+			form.createUserSysNo = currentUser.sysNo; // 根据实际用户对象字段调整
+			form.createUserName = currentUser.name;
+		}
+	});
+
+	// 添加产品
+	const addProductClick = () => {
+		// 向跳转的页面输送参数
+		uni.navigateTo({
+			url: '/pages/work/material/material?type=chooseMaterial',
+			
+		})
+	}
+
+	// 获取流程列表
+	const getStartProcessListClick = async () => {
+		const res = await getStartProcessList()
+		processOptions.value = [res.data.map(p => ({name: p.processName, sysNo: p.deploymentId}))];
+
+		// uni.hideLoading();
+		showProcessPicker.value = true;
+	}
+	
+	const confirmProcess = (e) => {
+		if (e.value && e.value.length > 0) {
+			const SProcess = e.value[0]; // SProcess 是选中的完整流程对象，例如 { name: '标准入库流程', sysNo: 'PROC001', ... }
+			selectedProcess.value = SProcess; 
+
+			// 更新表单中的流程ID和流程名称 (根据您的form结构调整)
+			// 假设您在 form 中有 workFlowSysNo 和 workFlowName
+			if (form && typeof form === 'object') { // 确保 form 存在且是对象
+				form.workFlowSysNo = SProcess.sysNo; // 将流程ID存入表单
+				form.workFlowName = SProcess.name;   // 将流程名称存入表单 (用于显示)
+			}
+		}
+		showProcessPicker.value = false; // 关闭选择器
+	}
+
+	// 仓库类型选择器相关
+	const showWarehouseTypePicker = ref(false);
+	const warehouseTypeOptions = ref([
+		["行政劳保仓库", "1号仓库", "2号仓库", "3号仓库", "优诺仓库", "物联仓库"]
+	]);
+
+	// 仓库类型选择点击事件
+	const showWarehouseTypePickerClick = () => {
+		showWarehouseTypePicker.value = true;
+	}
+	
+	// 仓库类型确认选择事件
+	const confirmWarehouseType = (e) => {
+		form.cklx = e.value[0];
+		showWarehouseTypePicker.value = false;
+	}
+
+	// 核验人选择器相关
+	const showAcceptanceUserPicker = ref(false);
+	const acceptanceUserOptions = ref([
+		["张三", "里斯", "王五", "赵六", "孙七", "周八"]
+	]);
+
+	// 核验人选择点击事件
+	const showAcceptanceUserPickerClick = async () => {
+		// 先跳转到联系人选择页面
+		uni.navigateTo({
+			url: '/pages/work/task/contact'
+		})
+		acceptanceUserOptions.value = [["张三", "里斯", "王五", "赵六", "孙七", "周八"]];
+
+		showAcceptanceUserPicker.value = true;
+	}
+	
+	// 核验人确认选择事件
+	// const confirmAcceptanceUser = (e) => {
+	// 	form.acceptanceUserName = e.value[0];
+	// 	showAcceptanceUserPicker.value = false;
+	// }
+
+	// 采购单选择器相关
+	const showmyPurchasePicker = ref(false);
+	const myPurchaseOptions = ref([]);
+	
+	// 采购单选择点击事件	
+	const showmyPurchasePickerClick = async () => {
+		const res = await getPurchaseOrderNumber()
+		console.log(res.data)
+		myPurchaseOptions.value = res.data.map(item => ({
+			label: item.name || item.code  || `${item.sysNo}`, // 显示采购单名称或编号
+			value: item.sysNo // 采购单流水号
+		}));
+		console.log(myPurchaseOptions.value)
+		showmyPurchasePicker.value = true;
+	}
+	
+	// 采购单确认选择事件
+	const confirmmyPurchase = (e) => {
+		form.proPurchaseSysNo = e.value[0].value;
+		showmyPurchasePicker.value = false;
+	}
+	
 </script>
 
 <style setup lang="scss">
@@ -326,8 +541,13 @@
 		color: #092D5C !important;
 	}
 
+	::v-deep .u-tabs-item {
+		color: #092D5C !important;
+	}
+
 	.content {
 		padding: 30rpx;
+		padding-top: 130rpx;
 
 		.updataLeft {
 			image {

@@ -9,12 +9,12 @@
 
 		</up-navbar>
 		<up-tabs :scrollable="false" :list="list" @click="tabclick"
-			itemStyle="padding:0 50rpx; height: 34rpx; margin:30rpx 0;" inactiveStyle="font-size: 28rpx;color: #B7C4D7;"
+			itemStyle="padding:0 50rpx; height: 34rpx; margin:30rpx 0; " inactiveStyle="font-size: 28rpx;color: #B7C4D7;"
 			activeStyle="color: #092D5C;font-size:30rpx"></up-tabs>
 
 		<view class="up-p-t-20 up-p-b-20" style="background:#ffffff;">
 			<up-search class="up-m-b-20" placeholder="请输入查找内容" v-model="searchParam" :showAction="false" bgColor="#F6F8FC"
-				height="40" @search=""></up-search>
+				height="40" @search="search"></up-search>
 
 			<view class="u-flex filter u-col-center u-row-around">
 				<!-- 时间 -->
@@ -187,6 +187,10 @@
 		const month = String(date.getMonth() + 1).padStart(2, '0');
 		const day = String(date.getDate()).padStart(2, '0');
 		return `${year}-${month}-${day}`;
+	}
+	// 新建跟进
+	const addFlow = () => {
+		uni.$u.route('/pages/work/Client/addFollow')
 	}
 </script>
 

@@ -8,26 +8,26 @@
 		</view>
 		<view class="card">
 			<view style="background:#ffffff; padding:30rpx">
-				<up-checkbox-group v-model="checkboxValue1" placement="column" @change="checkboxChange" shape="circle">
+				<up-radio-group v-model="radioValue" placement="column" @change="radioChange" shape="circle">
 					<view v-for="(item, index) in checkboxList1" :key="index" class="item u-flex u-col-center u-row-between">
-						<up-checkbox :customStyle="{marginBottom: '8px'}" :label="item.name" :name="item.name">
-						</up-checkbox>
+						<up-radio :customStyle="{marginBottom: '8px'}" :label="item.name" :name="item.name" :checked="index === 0">
+						</up-radio>
 						<view class="xiaj">
 							<image src="/static/logo.png"></image>
 							下级
 						</view>
 					</view>
-				</up-checkbox-group>
+				</up-radio-group>
 			</view>
 		</view>
 		<view class="card">
 			<view style="background:#ffffff; padding:30rpx">
-				<up-checkbox-group v-model="checkboxValue1" placement="column" @change="checkboxChange" shape="circle">
+				<up-radio-group v-model="checkboxValue1" placement="column" @change="checkboxChange" shape="circle">
 					<view v-for="(item, index) in checkboxList1" :key="index" class="item u-flex u-col-center u-row-between">
-						<up-checkbox :customStyle="{marginBottom: '8px'}" :label="item.name" :name="item.name">
-						</up-checkbox>
+						<up-radio :customStyle="{marginBottom: '8px'}" :label="item.name" :name="item.name">
+						</up-radio>
 					</view>
-				</up-checkbox-group>
+				</up-radio-group>
 			</view>
 		</view>
 		<view class="botFixd u-flex u-col-center u-row-between">
@@ -39,7 +39,7 @@
 
 <script setup>
 	import {
-		userGetDepartList
+		userGetDepartList,
 	} from '/api/user.js'
 	import {
 		onLoad
@@ -74,9 +74,10 @@
 	})
 	const DepartList = () => {
 		userGetDepartList({
-			departSysNo:store.userInfo.sysNo
+			departSysNo: "0"
 		}).then(res => {
 			console.log(res)
+			checkboxList1.splice(0, checkboxList1.length, ...res.data.deptList)
 		})
 	}
 	const checkboxChange = (n) => {

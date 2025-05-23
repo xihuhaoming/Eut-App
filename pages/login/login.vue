@@ -85,6 +85,9 @@
 			if (code == 200) {
 				setToken(data.token)
 				store.setUserinfo(data.userInfo);
+
+				// 新增：将用户信息也存储到StorageSync，以便持久化
+				uni.setStorageSync('userInfo', data.userInfo); 
 		
 				uni.switchTab({
 					url: '/pages/index/index'

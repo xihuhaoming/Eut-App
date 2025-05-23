@@ -61,7 +61,7 @@
 	import { props } from './props';
 	import { mpMixin } from '../../libs/mixin/mpMixin';
 	import { mixin } from '../../libs/mixin/mixin';
-	import dayjs from 'dayjs/esm/index';
+	import dayjs from 'dayjs';
 	import { range, error, padZero } from '../../libs/function/index';
 	import test from '../../libs/function/test';
 	/**
@@ -72,7 +72,7 @@
 	 * @property {Boolean}			showToolbar			是否显示顶部的操作栏  ( 默认 true )
 	 * @property {String | Number}	modelValue		    绑定值
 	 * @property {String}			title				顶部标题
-	 * @property {String}			mode				展示格式 mode=date为日期选择，mode=time为时间选择，mode=year-month为年月选择，mode=datetime为日期时间选择  ( 默认 ‘datetime )
+	 * @property {String}			mode				展示格式 mode=date为日期选择，mode=time为时间选择，mode=year-month为年月选择，mode=datetime为日期时间选择  ( 默认 'datetime )
 	 * @property {Number}			maxDate				可选的最大时间  默认值为后10年
 	 * @property {Number}			minDate				可选的最小时间  默认值为前10年
 	 * @property {Number}			minHour				可选的最小小时，仅mode=time有效   ( 默认 0 )

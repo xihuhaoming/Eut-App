@@ -92,7 +92,7 @@
 				{
 					img: "/static/work/icon11.png",
 					name: "物资管理",
-					url: ""
+					url: "/pages/work/material/material"
 				},
 				{
 					img: "/static/work/icon12.png",
