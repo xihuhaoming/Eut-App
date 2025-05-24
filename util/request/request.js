@@ -75,6 +75,8 @@ export function post(url, params, resolveType, type = 'post') {
 	})
 };
 export function get(url, params, resolveType, type = 'get') {
+	console.log('请求URL:', APIURL + url);
+    console.log('请求参数:', params);
 	return new Promise((resolve, reject) => {
 		uni.showLoading({})
 		http[type](APIURL + url, params).then(res => {

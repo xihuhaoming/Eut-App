@@ -58,17 +58,20 @@
 			</view>
 		</view>
 		<view class="content">
-			<view class="itemkh up-m-t-20" @click="detaileTap()">
-				<view class="title">公司名称</view>
-				<view class="u-flex u-col-center up-m-t-10">
-					<view class="bqclass">标签</view>
-					<view class="bqclass">标签</view>
-					<view class="bqclass">标签</view>
+			<view v-for="item in EnterPriseClientList" :key="item.id">
+				<view class="itemkh up-m-t-20" @click="detaileTap(item)">
+					<view class="title">{{item.contacts}}</view>
+					<view class="u-flex u-col-center up-m-t-10" v-if="item.labelName">
+						<view v-for="tag in item.labelName?.split(',')" :key="tag">
+							<view class="bqclass">{{tag}}</view>
+						</view>
+					</view>
+					<view class="up-m-t-30 laiy">来源：{{item.customerType === 0 ? '新客户' : item.customerType === 1 ? '老客户' : '激活客户' }}</view>
+					<view class="up-m-t-10 laiy">等级：{{ item.level === 0 ? '普通客户' : item.level === 1 ? '钻石客户' : 'VIP客户' }}</view>
+					<image src="/static/msg.png"></image>
 				</view>
-				<view class="up-m-t-30 laiy">来源：老客户</view>
-				<view class="up-m-t-10 laiy">等级：钻石客户</view>
-				<image src="/static/msg.png"></image>
 			</view>
+			
 		</view>
 		<view class="bottom u-flex u-col-center u-row-center">
 			<view class="botitem u-flex u-col-center" @click="addFlow()">
@@ -93,6 +96,8 @@
 		reactive,
 		onMounted
 	} from 'vue';
+
+	import { API_getEnterpriseClient, API_getPersonalClient } from '@/api/client';
 
 	const lxshow = ref(false);
 	const lxValue = ref("")
@@ -124,9 +129,14 @@
 	const timeshow1 = ref(false);
 	const timeshow2 = ref(false);
 
+
+
 	// 详情
 	const detaileTap = (e) => {
-		uni.$u.route('/pages/work/Client/Details')
+		// 使用uni-app的路由方法跳转到客户详情页面，并传递客户ID作为参数
+		uni.$u.route('/pages/work/Client/Details', {
+			id: e.sysNo
+		})
 	}
 	// 选择类型Z 
 	const itemClick = (e) => {
@@ -136,6 +146,12 @@
 	const tabclick = (e) => {
 		console.log(e)
 		tabIndex.value = e.index
+		if (e.index === 0) {
+			getEnterpriseClient()
+		} else {
+			EnterPriseClientList.value = []
+			getPersonalClient()
+		}
 	}
 	// 关闭筛选框
 	const closeDropdown = () => {
@@ -193,6 +209,40 @@
 	const addFlow = () => {
 		uni.$u.route('/pages/work/Client/addFollow')
 	}
+	onMounted(() => {
+		getEnterpriseClient()
+	})
+	
+
+	const EnterPriseClientList = ref([]);
+	// 客户标签
+	const clientLabel = ref([])
+	// 获取企业客户
+	const getEnterpriseClient = async () => {
+		const params = {
+			type: '1',
+			pageIndex: '1',
+			pageSize: '10'
+		}
+		const res = await API_getEnterpriseClient(params)
+		EnterPriseClientList.value = res.data.records
+		console.log(res.data)
+	}
+
+	// 获取个人客户
+	const getPersonalClient = async () => {
+		const params = {
+			type: '2',
+			pageIndex: '1',
+			pageSize: '10'
+		}
+		const res = await API_getPersonalClient(params)
+		console.log(res.data)
+	}
+
+
+
+	
 </script>
 
 <style setup lang="scss">
@@ -257,6 +307,7 @@
 
 	.content {
 		padding: 30rpx;
+		padding-bottom: 150rpx;
 	}
 
 	.bottom {

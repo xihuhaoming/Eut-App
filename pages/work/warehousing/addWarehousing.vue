@@ -29,15 +29,15 @@
 					<up-icon name="plus-circle" size="20px" color="#5A78A0"></up-icon>
 				</view>
 			</view>
-			<view class="card">
+			<view class="card" v-for="(item, index) in chooseProductList" :key="index">
 				<up-cell-group :border="false">
-					<up-cell title="产品" value="根据选择的产品显示名称" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-					<up-cell title="编码" value="2874392" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-					<up-cell title="品牌" value="20" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+					<up-cell title="产品" :value="item.entityName" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+					<up-cell title="编码" :value="item.entityCode" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+					<up-cell title="品牌" :value="item.brand" :isLink="false" arrow-direction="right" :required="false"></up-cell>
 					<up-cell title="型号" value="20" :isLink="false" arrow-direction="right" :required="false"></up-cell>
 					<up-cell title="单价" :required="true" :isLink="false">
 						<template #value>
-							<input v-model="name" placeholder="请输入" type="text" style="text-align:right;font-size:26rpx;" />
+							<input v-model="form.proPurchaseEntities[index].price" placeholder="请输入" type="text" style="text-align:right;font-size:26rpx;" />
 						</template>
 					</up-cell>
 					<up-cell title="数量" :required="false" :isLink="false">
@@ -49,7 +49,7 @@
 							</view>
 						</template>
 					</up-cell>
-					<view class="up-m-t-20 up-m-t-20 u-text-center" style="color:red">删除</view>
+					<view class="up-m-t-20 up-m-t-20 u-text-center" @click="deleteProductClick(index)" style="color:red">删除</view>
 				</up-cell-group>
 			</view>
 			<view class="card up-m-t-20">
@@ -210,7 +210,8 @@
 	import {
 		ref,
 		reactive,
-		onMounted
+		onMounted,
+		onUnmounted
 	} from 'vue';
 
 	import { onLoad } from '@dcloudio/uni-app'; // 用于获取页面参数
@@ -233,7 +234,7 @@
 	
 
 	const uFormRef = ref(null); // 表单引用
-
+	const selectedProduct = ref(null);
 	// --- 新增用于流程选择的数据 ---
 	const showProcessPicker = ref(false);
 	const processOptions = ref([]); // 将由 API 调用填充
@@ -409,21 +410,48 @@
 
 
 	// 页面加载时，可以尝试获取当前登录用户信息
-	onLoad(async () => {
+	onLoad(async (options) => {
 		// 假设从本地存储获取用户信息
 		const currentUser = uni.getStorageSync('userInfo'); // 假设用户信息存储在 'userInfo'
 		if (currentUser) {
 			form.createUserSysNo = currentUser.sysNo; // 根据实际用户对象字段调整
 			form.createUserName = currentUser.name;
 		}
+		// 监听从产品选择页面返回的数据
+		uni.$on('confirmProduct', handleConfirmProduct);
+
+		if (options && options.id) {
+           console.log('需要加载入库单详情:', options.id);
+           // TODO: 根据 options.id 获取入库单详情并填充表单
+       }
 	});
 
-	// 添加产品
+	// 组件卸载时移除事件监听
+	onUnmounted(() => {
+       uni.$off('confirmProduct', handleConfirmProduct);
+   });
+
+   
+   const chooseProductList = ref([])
+
+   // 接收产品选择页面返回的数据
+   const handleConfirmProduct = (selectedProduct) => {
+       console.log('接收到的产品:', selectedProduct);
+	   form.proPurchaseEntities = selectedProduct;
+	   selectedProduct.value = selectedProduct;
+	   chooseProductList.value.push(selectedProduct)
+   };
+
+   // 删除产品
+   const deleteProductClick = (index) => {
+	   chooseProductList.value.splice(index, 1);
+   }
+
+	
+	// 跳转到产品选择页面
 	const addProductClick = () => {
-		// 向跳转的页面输送参数
 		uni.navigateTo({
-			url: '/pages/work/material/material?type=chooseMaterial',
-			
+			url: '/pages/work/material/material?type=chooseMaterial'
 		})
 	}
 
@@ -511,6 +539,14 @@
 	const confirmmyPurchase = (e) => {
 		form.proPurchaseSysNo = e.value[0].value;
 		showmyPurchasePicker.value = false;
+	}
+
+	// 提交所有数据到后端进行入库
+	const submitWarehousing = async () => {
+		// 表单数据打印出来
+		console.log('提交的表单数据：', form)
+		const res = await addWarehousing(form)
+		console.log(res)
 	}
 	
 </script>
