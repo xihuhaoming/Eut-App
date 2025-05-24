@@ -8,11 +8,10 @@
 		<view class="content" v-if="tabIndex==0">
 			<view class="card">
 				<up-cell-group :border="false">
-					<up-cell title="申请人" :value="form.createUserName" :isLink="true" arrow-direction="right" :required="true"></up-cell>
+					<up-cell title="申请人" :value="form.user" :isLink="true" arrow-direction="right" :required="true"></up-cell>
 					<up-cell title="入库流程" :value="form.workFlowName || '选择的流程'" :isLink="true" @click="getStartProcessListClick" arrow-direction="right" :required="true"></up-cell>
-					<!-- <up-cell title="办理人" value="根据流程显示" :isLink="true" arrow-direction="right" :required="true"></up-cell> -->
 					<up-cell title="仓库类型" :value="form.cklx || '选择的仓库类型'" :isLink="true" @click="showWarehouseTypePickerClick" arrow-direction="right" :required="true"></up-cell>
-					<up-cell title="核验人" :value="form.acceptanceUserName || '根据流程显示'" :isLink="true" @click="showAcceptanceUserPickerClick" arrow-direction="right" :required="true"></up-cell>
+					<up-cell title="核验人" :value="form.acceptanceUserName || '选择核验人'" :isLink="true" @click="showAcceptanceUserPickerClick" arrow-direction="right" :required="true"></up-cell>
 					<up-cell title="采购单号" :value="form.proPurchaseSysNo || '选择的采购单'" :isLink="true" @click="showmyPurchasePickerClick" arrow-direction="right" :required="false"></up-cell>
 
 				</up-cell-group>
@@ -29,38 +28,44 @@
 					<up-icon name="plus-circle" size="20px" color="#5A78A0"></up-icon>
 				</view>
 			</view>
-			<view class="card" v-for="(item, index) in chooseProductList" :key="index">
-				<up-cell-group :border="false">
-					<up-cell title="产品" :value="item.entityName" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-					<up-cell title="编码" :value="item.entityCode" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-					<up-cell title="品牌" :value="item.brand" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-					<up-cell title="型号" value="20" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-					<up-cell title="单价" :required="true" :isLink="false">
-						<template #value>
-							<input v-model="form.proPurchaseEntities[index].price" placeholder="请输入" type="text" style="text-align:right;font-size:26rpx;" />
-						</template>
-					</up-cell>
-					<up-cell title="数量" :required="false" :isLink="false">
-						<template #value>
-							<view class="u-flex">
-								<up-icon name="minus-circle-fill" color="#B7C4D7" size="16"></up-icon>
-								<view class="up-m-l-10 up-m-r-10">1</view>
-								<up-icon name="plus-circle-fill" color="#2979ff" size="16"></up-icon>
-							</view>
-						</template>
-					</up-cell>
-					<view class="up-m-t-20 up-m-t-20 u-text-center" @click="deleteProductClick(index)" style="color:red">删除</view>
-				</up-cell-group>
-			</view>
+				<view class="up-m-t-20" v-for="(item, index) in form.proPurchaseEntities" :key="index">
+					<view class="card" >
+						<up-cell-group :border="false" class="up-m-t-20">
+							<up-cell title="产品" :value="item.entityName" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+							<up-cell title="编码" :value="item.entityCode" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+							<up-cell title="品牌" :value="item.brand || '无'" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+							<up-cell title="型号" value="20" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+							<up-cell title="单价" :required="true" :isLink="false">
+								<template #value>
+									<input v-model="item.entityPrice" placeholder="请输入" type="text" style="text-align:right;font-size:26rpx;" />
+								</template>
+							</up-cell>
+							<up-cell title="数量" :required="false" :isLink="false">
+								<template #value>
+									<view class="u-flex">
+
+										<up-icon name="minus-circle-fill" v-if="isOverNumber ? {color: '#2979ff' } : {color: '#B7C4D7'}" size="16" @click="decreaseQuantity(index)"></up-icon>
+										<view class="up-m-l-10 up-m-r-10">{{ item.number || 1 }}</view>
+										<up-icon name="plus-circle-fill" color="#2979ff" size="16" @click="increaseQuantity(index)"></up-icon>
+									</view>
+								</template>
+							</up-cell>
+							<up-cell title="总金额" :value="calculateTotalPrice(item)" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+
+							<view class="up-m-t-20 up-m-t-20 u-text-center" @click="deleteProductClick(index)" style="color:red">删除</view>
+						</up-cell-group>
+					</view>
+				</view>
+			
 			<view class="card up-m-t-20">
 				<view class="zhoLf">备注</view>
 				<view class="textClass up-m-t-20">
-					<view>如怀疑存在 DNS 劫持，可尝试更换 D</view>
+					<textarea type="textarea" placeholder="请输入备注" border="surround" v-model="form.remarks"></textarea>
 				</view>
 			</view>
 
 
-			<view class="qued up-m-t-70">提交</view>
+			<view class="qued up-m-t-70" @click="submitWarehousing">提交</view>
 			<!-- <view class="qued up-m-t-70">提交</view> -->
 		</view>
 		<view v-if="tabIndex==1">
@@ -215,11 +220,9 @@
 	} from 'vue';
 
 	import { onLoad } from '@dcloudio/uni-app'; // 用于获取页面参数
-	import { addInboundOrder } from '@/api/inbound.js'; // 引入API函数，注意路径是否正确
-	import { getToken } from '@/util/auth.js'; // 用于获取用户信息等
 	import { getStartProcessList } from '@/api/inbound.js'; // 引入API函数，注意路径是否正确
 	import { getPurchaseOrderNumber } from '@/api/inbound.js'; // 引入API函数，注意路径是否正确
-
+	import { addInboundOrder } from '@/api/inbound.js'; // 引入API函数，注意路径是否正确
 	const tabIndex = ref(0)
 	const keyword = ref("")
 	const typeValue = ref(1)
@@ -240,55 +243,21 @@
 	const processOptions = ref([]); // 将由 API 调用填充
 	const selectedProcess = ref(null); 
 
-	// 表单数据模型 (更贴近当前UI和API核心需求)
+	const isOverNumber = ref(0);
+	// 表单数据模型
 	const form = reactive({
-		createUserSysNo: '', // 新增人流水号 (可选, 后端也可能自动填充)
-		createUserName: '',  // 新增人姓名 (可选, 后端也可能自动填充)
-		createInDate: '',    // 新增时间 (可选, 后端也可能自动填充)
-		// sysNo: '', // 流水号 (通常后端生成)
-		// inEntSysNo: '', // 企业流水号 (可能从当前用户或全局配置获取)
-		
-		proSupplierSysNo: '', // 供应商流水号 (如果需要选择供应商)
-		proSupplierName: '',  // 供应商名称 (如果需要选择供应商)
-		
-		inDate: '',          // 入库日期 (必填)
-		inUserSysNo: '',     // 跟单员流水号 (根据选择或流程确定)
-		inUserName: '',      // 跟单员姓名
+		user: '', // 办理人
+		proPurchaseSysNo: '',    // 采购单流水号
 		acceptanceUserSysNo: '', // 验收员流水号
-		acceptanceUserName: '',  // 验收员姓名
-		proPurchaseSysNo: '',    // 采购单流水号 (可选)
-		storekeeperUserSysNo: '', // 仓管员流水号
-		storekeeperUserName: '',  // 仓管员姓名
+		acceptanceUserName: '', // 验收员姓名
 		remarks: '',         // 备注
-		
 		// --- 工作流相关字段 ---
-		// workMyJobSysNo: '', 
-		// user: '', // 办理人 (可能就是 inUserName 或其他)
 		workFlowSysNo: '', // 工作流流水号
-		// workFlowName: '', // 工作流名称 (用于显示)
-		handlerUserName: '', // 办理人名称 (用于显示)
-
 		// 产品列表
-		proPurchaseEntities: [
-			// 示例:
-			{
-			  proEntityName: '', // 名
-			  code: '',          // UI上目前是静态文本，应改为产品选择后自动填充
-			  price: 0,          // UI上有input
-			  number: 1,         // UI上有数量调整
-			  allPrice: 0,       // 自动计算
-			  // proEntitySysNo: '' // 选择产品后自动填充
-			}
-		],
-
-		// --- 其他业务字段 ---
-		allPrice: 0,         // 总金额 (可以前端计算，也可后端计算)
-		// status: 0, // 状态 (通常由后端管理)
-		// type: '', // 入库类型 (如果需要)
-		cklx: '',            // 仓库类型 (必填)
-		name: '',             // 入库名称 (必填)
-		// flag: '', // 状态 (通常后端管理)
-		// workMyJobFlags: [], // 工作流节点 (通常后端处理或根据选择的流程带出)
+		proPurchaseEntities: [],
+		cklx: '',            // 仓库类型
+		inUserSysNo: '',     // 跟单员
+		inUserName: '',      // 跟单员
 	});
 
 	const typeList = reactive([{
@@ -414,8 +383,8 @@
 		// 假设从本地存储获取用户信息
 		const currentUser = uni.getStorageSync('userInfo'); // 假设用户信息存储在 'userInfo'
 		if (currentUser) {
-			form.createUserSysNo = currentUser.sysNo; // 根据实际用户对象字段调整
-			form.createUserName = currentUser.name;
+			form.sysNo = currentUser.sysNo; // 根据实际用户对象字段调整
+			form.user = currentUser.name;
 		}
 		// 监听从产品选择页面返回的数据
 		uni.$on('confirmProduct', handleConfirmProduct);
@@ -424,29 +393,65 @@
            console.log('需要加载入库单详情:', options.id);
            // TODO: 根据 options.id 获取入库单详情并填充表单
        }
+
+	   uni.$on('receiveUser', handleReceiveUser);
 	});
 
 	// 组件卸载时移除事件监听
 	onUnmounted(() => {
        uni.$off('confirmProduct', handleConfirmProduct);
+	   uni.$off('receiveUser', handleReceiveUser);
    });
 
    
-   const chooseProductList = ref([])
+
+   const handleReceiveUser = (data) => {
+	   console.log('接收到的用户:', data);
+	   form.acceptanceUserName = data.name;
+	   form.acceptanceUserSysNo = data.sysNo;
+   }
 
    // 接收产品选择页面返回的数据
    const handleConfirmProduct = (selectedProduct) => {
-       console.log('接收到的产品:', selectedProduct);
-	   form.proPurchaseEntities = selectedProduct;
-	   selectedProduct.value = selectedProduct;
-	   chooseProductList.value.push(selectedProduct)
+       	console.log('接收到的产品:', selectedProduct);
+		// 确保产品对象有number字段，默认为1
+		if (!selectedProduct.number) {
+			selectedProduct.number = 1;
+		}
+	   	form.proPurchaseEntities.push(selectedProduct)
    };
 
    // 删除产品
    const deleteProductClick = (index) => {
-	   chooseProductList.value.splice(index, 1);
+	   form.proPurchaseEntities.splice(index, 1);
    }
 
+   
+
+   // 增加数量
+	const increaseQuantity = (index) => {
+		isOverNumber.value = true;
+		if (form.proPurchaseEntities[index]) {
+			if (!form.proPurchaseEntities[index].number) {
+				form.proPurchaseEntities[index].number = 1;
+			} else {
+				form.proPurchaseEntities[index].number++;
+			}
+		}
+	}
+
+	// 减少数量
+	const decreaseQuantity = (index) => {
+		if (form.proPurchaseEntities[index] && form.proPurchaseEntities[index].number > 1) {
+			form.proPurchaseEntities[index].number--;
+		}
+	}
+	// 计算单个产品的总价
+	const calculateTotalPrice = (item) => {
+		const price = parseFloat(item.entityPrice) || 0;
+		const number = parseInt(item.number) || 1;
+		return (price * number).toFixed(2);
+	}
 	
 	// 跳转到产品选择页面
 	const addProductClick = () => {
@@ -463,11 +468,14 @@
 		// uni.hideLoading();
 		showProcessPicker.value = true;
 	}
+
 	
 	const confirmProcess = (e) => {
 		if (e.value && e.value.length > 0) {
 			const SProcess = e.value[0]; // SProcess 是选中的完整流程对象，例如 { name: '标准入库流程', sysNo: 'PROC001', ... }
-			selectedProcess.value = SProcess; 
+			selectedProcess.value = SProcess;
+			
+			console.log("选中的流程：", SProcess)
 
 			// 更新表单中的流程ID和流程名称 (根据您的form结构调整)
 			// 假设您在 form 中有 workFlowSysNo 和 workFlowName
@@ -506,7 +514,7 @@
 	const showAcceptanceUserPickerClick = async () => {
 		// 先跳转到联系人选择页面
 		uni.navigateTo({
-			url: '/pages/work/task/contact'
+			url: '/pages/work/task/contact?type=acceptanceUser'
 		})
 		acceptanceUserOptions.value = [["张三", "里斯", "王五", "赵六", "孙七", "周八"]];
 
@@ -541,12 +549,130 @@
 		showmyPurchasePicker.value = false;
 	}
 
+
+	// 提交之前校验所有form表单数据，并打印
+	// 表单校验函数
+	const validateForm = () => {
+		// 校验申请人
+		if (!form.user) {
+			uni.showToast({
+				title: '请填写申请人',
+				icon: 'none'
+			});
+			return false;
+		}
+		
+		// 校验入库流程
+		if (!form.workFlowSysNo) {
+			uni.showToast({
+				title: '请选择入库流程',
+				icon: 'none'
+			});
+			return false;
+		}
+		
+		// 校验仓库类型
+		if (!form.cklx) {
+			uni.showToast({
+				title: '请选择仓库类型',
+				icon: 'none'
+			});
+			return false;
+		}
+		
+		// 校验核验人
+		if (!form.acceptanceUserName) {
+			uni.showToast({
+				title: '请选择核验人',
+				icon: 'none'
+			});
+			return false;
+		}
+		
+		// 校验产品列表
+		if (!form.proPurchaseEntities || form.proPurchaseEntities.length === 0) {
+			uni.showToast({
+				title: '请添加产品',
+				icon: 'none'
+			});
+			return false;
+		}
+		
+		// 校验每个产品的必填信息
+		for (let i = 0; i < form.proPurchaseEntities.length; i++) {
+			const item = form.proPurchaseEntities[i];
+			
+			// 校验产品名称
+			if (!item.entityName) {
+				uni.showToast({
+					title: `第${i+1}个产品名称不能为空`,
+					icon: 'none'
+				});
+				return false;
+			}
+			
+			// 校验产品单价
+			if (!item.entityPrice) {
+				uni.showToast({
+					title: `第${i+1}个产品单价不能为空`,
+					icon: 'none'
+				});
+				return false;
+			}
+			
+			// 校验产品数量
+			if (!item.number || parseInt(item.number) <= 0) {
+				uni.showToast({
+					title: `第${i+1}个产品数量必须大于0`,
+					icon: 'none'
+				});
+				return false;
+			}
+		}
+		
+		// 所有校验通过
+		return true;
+	}
+
 	// 提交所有数据到后端进行入库
 	const submitWarehousing = async () => {
+		 // 校验表单数据
+		 if (!validateForm()) {
+			return; // 如果校验失败，终止提交
+		}
+		// 给form.proPurchaseEntities赋值然后打包给后端
+		form.proPurchaseEntities = form.proPurchaseEntities.map(item => {
+        	// 计算单个产品的总价
+			const price = parseFloat(item.entityPrice) || 0;
+			const number = parseInt(item.number) || 1;
+			const itemAllPrice = price * number;
+			
+			return {
+				proEntitySysNo: item.sysNo,
+				proEntityName: item.entityName,
+				price: price,
+				code: item.entityCode,
+				number: number,
+				allPrice: itemAllPrice // 每个产品的小计（单价×数量）
+			};
+		});
+
+		// 计算所有产品的总价（可选，如果后端需要）
+		const totalPrice = form.proPurchaseEntities.reduce((acc, item) => acc + item.allPrice, 0);
+		form.proPurchaseEntities.allPrice = totalPrice; 
+		console.log(form.proPurchaseEntities)
 		// 表单数据打印出来
 		console.log('提交的表单数据：', form)
-		const res = await addWarehousing(form)
-		console.log(res)
+		try {
+			const res = await addInboundOrder(form)
+			console.log(res)
+			// form.proPurchaseEntities = []
+		} catch (error) {
+			console.log(error)
+		}
+		
+		// const res = await addWarehousing(form)
+		// console.log(res)
 	}
 	
 </script>
