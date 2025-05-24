@@ -60,17 +60,38 @@
 		reactive,
 		onMounted
 	} from 'vue';
-
+	import { onLoad } from '@dcloudio/uni-app'
 	const searchParam = ref("")
 	const listData = ref([])
+	const sourcePage = ref('')
 	onMounted(() => {
 		getList()
 	})
+	onLoad((e) => {
+		console.log(e,'e')
+		if(e.sourcePage) {
+			sourcePage.value = e.sourcePage
+		}
+		if(e.sysNo) {
+			contractDetile(e.sysNo)
+		}
+	})
 	const backkp = (item)=>{
 		console.log(item)
-		uni.reLaunch({
-			url:`/pages/work/makeOut/addmake?sysNo=${item.sysNo}`
-		})
+		if(!sourcePage.value) {
+			uni.reLaunch({
+				url:`/pages/work/makeOut/addmake?sysNo=${item.sysNo}`
+			})
+		}else {
+			if(sourcePage.value == 'addReceivepay') {
+				uni.setStorageSync('contractSysNo', item.sysNo)
+				uni.navigateBack()
+				// uni.reLaunch({
+				// 		url:`/pages/work/receivepay/addReceivepay?sysNo=${item.sysNo}`
+				// })
+			}
+		}
+		
 	}
 	const getList = () => {
 		API_getUnionContractList({

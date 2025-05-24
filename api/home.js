@@ -1,6 +1,7 @@
 import {
 	post,
-	get
+	get,
+	uploadFileFn
 } from "/util/request/request.js"
 
 // 任务列表
@@ -15,8 +16,13 @@ export function API_getWorkGroupList(params) {
 		params
 	})
 }
-
+// 
 // 修改密码
 // export function changePwd(params) {
 // 	return post('/user/changePwd', params)
 // }
+
+// 图片上传接口
+export function API_uploadImage(filePath) {
+	return uploadFileFn(filePath)
+}

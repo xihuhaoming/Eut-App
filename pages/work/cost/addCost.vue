@@ -10,30 +10,40 @@
 			</view>
 			<view class="card">
 				<up-cell-group :border="false">
-					<up-cell title="申请部门" value="易尤特集团" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-					<up-cell title="成本流程" value="履约金流程" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-					<up-cell title="审批人" value="审批人" :isLink="false" arrow-direction="right" :required="false"></up-cell>
-					<up-cell title="日期" value="2025.02.04" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-					<up-cell title="合同编号" value="2025.02.04" :isLink="true" arrow-direction="right" :required="true"></up-cell>
-					<up-cell title="客户名称" value="合同客户" :isLink="false" arrow-direction="right" :required="false"></up-cell>
+					<up-cell title="申请部门" @click="departshow = true" :value="formData.entDeptName" :isLink="true" arrow-direction="right" :required="true"></up-cell>
+					<up-cell title="成本流程" @click="processshow = true" :value="formData.processName" :isLink="true" arrow-direction="right" :required="true"></up-cell>
+					<!-- <up-cell title="审批人" value="审批人" :isLink="false" arrow-direction="right" :required="false"></up-cell> -->
+					<up-cell title="日期" @click="timeshow = true" :value="formData.createDate" :isLink="true" arrow-direction="right" :required="true"></up-cell>
+					<up-cell title="合同编号" @click="openContract" :value="formData.code" :isLink="true" arrow-direction="right" :required="true"></up-cell>
+					<up-cell title="客户名称" :value="formData.csrCustomerName" :isLink="false" arrow-direction="right" :required="false"></up-cell>
 					<up-cell title="合同金额" :isLink="false" arrow-direction="right" :required="false">
 						<template #right-icon>
-							<view style="color:#FE4949">1000</view>
+							<view style="color:#FE4949">{{formData.allPrice}}</view>
 						</template>
 					</up-cell> <up-cell title="回款金额" :isLink="false" arrow-direction="right" :required="false">
 						<template #right-icon>
-							<view style="color:#FE4949">1000</view>
+							<view style="color:#FE4949">{{formData.invoicePrice}}</view>
 						</template>
 					</up-cell> <up-cell title="付款金额" :isLink="false" arrow-direction="right" :required="false">
 						<template #right-icon>
-							<view style="color:#FE4949">1000</view>
+							<view style="color:#FE4949">{{formData.putPrice}}</view>
 						</template>
 					</up-cell> <up-cell title="已申请金额" :isLink="false" arrow-direction="right" :required="false">
 						<template #right-icon>
-							<view style="color:#FE4949">1000</view>
+							<view style="color:#FE4949">{{formData.waitApproveAmount}}</view>
 						</template>
 					</up-cell>
 				</up-cell-group>
+					<!-- 申请部门选择 -->
+					<up-picker :show="departshow" keyName="name" :columns="departList" @cancel="departshow = false" @confirm="departConfirm"></up-picker>
+					<!-- 成本流程选择 -->
+					<up-picker :show="processshow" keyName="processName" :columns="processList" @cancel="processshow = false" @confirm="processConfirm"></up-picker>
+					<!-- 日期选择 -->
+					<up-datetime-picker :minDate="1735660800000" :hasInput="false" class="timeView" hasInput :show="timeshow"
+					v-model="selectTime" mode="date" placeholder="开始时间" @confirm="timeConfirm"
+					@cancel="timeshow = false"></up-datetime-picker>
+					<!-- 合同选择 -->
+					<up-picker :show="contractshow" keyName="csrCustomerName" :columns="contractList" @cancel="contractshow = false" @confirm="contractConfirm"></up-picker>
 				<view class="u-flex u-row-between u-col-center">
 					<view class="xtitle bold">产品及付款信息</view>
 				</view>
@@ -211,8 +221,60 @@
 		reactive,
 		onMounted
 	} from 'vue';
+import {
+	API_finApiPerformanceList,
+	API_getUnionContractList,
+	API_getStartProcessList,
+		API_finApiReceivepayAdd,
+		API_finApiReceivepayList
+	} from '@/api/task.js'
+	import {
+		useCounterStore
+	} from '/store/counter';
+	import {
+		API_getDictType
+	} from '/api/client.js'
+import {
+		formatTimestamp
+	} from '/util/formatTimestamp.js'
+	import { getLabelByValue, statusList } from '@/util/dict.js'
+	import { onShow } from '@dcloudio/uni-app'
+	const store = useCounterStore();
 
-	const lxshow = ref(false);
+	const formData = ref({
+		entDeptName: '',
+		entDeptSysNo: '',
+		contractName: '',
+		contractSysNo: '',
+		projContractSysNo: '', //合同流水号
+		code: '', //合同编码
+		recPrice: '', //收款金额
+		type: '', //收款类型
+		account: '', //收款账户
+		accountSysNo: '', //收款账户流水号
+		remarks: '', //备注
+	})
+	// 部门列表
+
+	const departList = ref([])
+	const departshow = ref(false)	
+
+	const processList = ref([])	
+	const processshow = ref(false)
+
+	// 收款合同列表
+	const contractList = ref([])
+	const contractshow = ref(false)
+
+	// 收款类型列表
+	const lxList = ref([])
+	const lxshow = ref(false)
+	// 收款账户列表
+	const zhanghuList = ref([])
+	const zhanghushow = ref(false)
+	// 履约金列表
+	const performanceList = ref([])
+
 	const columns = reactive([
 		['油卡', '办公用品']
 	]);
@@ -275,16 +337,228 @@
 	const workValue = reactive([])
 	const workValue2 = reactive([])
 	const uDropdownRef = ref(null)
-	const startTime = ref('开始时间')
-	const endTime = ref('结束时间')
+	const startTime = ref(Date.now())
+	const endTime = ref(Date.now())
 	const timeshow1 = ref(false);
 	const timeshow2 = ref(false);
+		const timeshow = ref(false);
+	const selectTime = ref(Date.now())
+	formData.value.createDate = formatTimestamp(selectTime.value)
+onMounted(() => {
+	getDepartList()
+	getContractList()
+	getProcessList()
+	getLxType()
+})
+function goToContract() {
+		uni.navigateTo({
+			url: '/pages/work/contract/OptionContract?sourcePage=addCost',
+		})
+	}
+	onShow(() => {
+		let contractSysNo = uni.getStorageSync('contractSysNo')
+		if (contractSysNo) {
+			console.log(contractSysNo)
+			formData.value.projContractSysNo = contractSysNo
+			contractDetile(contractSysNo)
+			// contractData.value = JSON.parse(e.item)
+		}			
+	})
+	function goCostDetail(item) {
+		uni.navigateTo({
+			url: `/pages/work/cost/costDetile?sysNo=${item.sysNo}`
+		})
+	}
+			// 合同详情
+	const contractDetile = (sysNo) => {
+		API_contracthDetail({
+			sysNo: sysNo
+		}).then(res => {
+			contractData.value = res.data
+			console.log(contractData.value,'详情数据')
+			formData.value.projContractSysNo = res.data.sysNo || '' //合同流水号
+			formData.value.code = res.data.code || '' //合同编码
+			formData.value.csrCustomerName = res.data.csrCustomerName || '' //客户名称
+			formData.value.csrCustomerCode = res.data.csrCustomerCode || '' //客户税号
+			formData.value.allPrice = res.data.allPrice || '' //合同总金额
+			formData.value.putPrice = res.data.putPrice || '' //已支付履约金
+			formData.value.rPrice = res.data.assPrice || '' //考核金额
+			formData.value.waitApproveAmount = res.data.waitApproveAmount || '' //待确认金额
+			proServerList.value[0] = contractData.value.projContractServer || [] //产品服务
+		})
+	}
+	// 获取履约金列表
+	function getPerformanceList() {
+		API_finApiPerformanceList().then(res => {
+			console.log(res,'履约金列表')
+			if(res.code == 200) {
+				let result = res.data
+				performanceList.value[0] = result
+				console.log(performanceList.value)
+			}
+		})
+	}
+	// 获取部门列表
+	function getDepartList() {
+		console.log(store.userInfo,'userinfo')
+		let result = store.userInfo?.deptList
+		departList.value[0] = result
+		console.log(departList.value)
+	}
+		// 获取成本流程列表
+	function getProcessList() {
+		API_getStartProcessList({
+			category: 'costPayment'
+		}).then(res => {
+			if(res.code == 200) {
+				let result = res.data
+				processList.value[0] = result
+				console.log(processList.value)
+			}
+		})
+	}
+	// 获取收款合同列表
+	function getContractList() {
+		API_getUnionContractList().then(res => {
+			console.log(res,'收款合同列表')
+			if(res.code == 200) {
+				let result = res.data
+				contractList.value[0] = result
+				console.log(contractList.value)
+			}
+		})
+	}
+		// 获取收款类型
+	function getLxType() {
+		API_getDictType({dictType: 'receivepay_type'}).then(res => {
+			console.log(res,'收款类型')
+			if(res.code == 200) {
+				let result = res.data
+				lxList.value[0] = result
+				console.log(lxList.value)
+			}
+		})
+	}
 
-	// 选择报销类型
+	// 申请部门选择
+	const departConfirm = (e) => {
+		console.log(e)
+		formData.value.entDeptName = e.value[0].name
+		formData.value.entDeptSysNo = e.value[0].sysNo
+		departshow.value = false
+	}
+	// 合同选择
+	const contractConfirm = (e) => {
+		console.log(e)
+		formData.value.contractName = e.value[0].csrCustomerName
+		formData.value.contractSysNo = e.value[0].sysNo
+		formData.value.allPrice = e.value[0].allPrice
+		formData.value.invoicePrice = e.value[0].invoicePrice
+		formData.value.putPrice = e.value[0].putPrice
+		contractshow.value = false
+	}
+	// 收款类型选择
 	const qeudlx = (e) => {
 		console.log(e)
 		lxValue.value = e.value[0]
 		lxshow.value = false
+	}
+	// 成本流程选择
+	const processConfirm = (e) => {
+		console.log(e)
+		formData.value.processName = e.value[0].processName
+		formData.value.workFlowSysNo = e.value[0].definitionId
+		processshow.value = false
+	}
+	function submitClick() {
+		console.log(formData.value)
+		if(verifyForm()) {
+			uni.showLoading({
+				title: '提交中...',
+				mask: true
+			})
+			try {
+				API_finApiReceivepayAdd(formData.value).then(res => {
+					console.log(res)
+					if(res.code == 200) {
+					uni.showToast({
+						title: '提交成功',
+						icon: 'success'
+					})
+					uni.hideLoading()
+				}
+			}).catch(err => {
+				uni.hideLoading()
+				uni.showToast({
+					title: err.message || '提交失败',
+						icon: 'none'
+					})
+				})
+			} catch (err) {
+				uni.hideLoading()
+				uni.showToast({
+					title: err.message || '提交失败',
+					icon: 'none'
+				})
+			}
+		}
+	}
+	function verifyForm() {
+		if(formData.value.entDeptSysNo == '') {
+			uni.showToast({
+				title: '请选择部门',
+				icon: 'none'
+			})
+			return false
+		}
+	
+		if(formData.value.projContractSysNo == '') {
+			uni.showToast({
+				title: '请选择合同',
+				icon: 'none'
+			})
+			return false
+		}
+		if(formData.value.recPrice == '') {
+			uni.showToast({
+				title: '请选择产品',
+				icon: 'none'
+			})
+			return false
+		}
+		if(formData.value.inType == '') {
+			uni.showToast({
+				title: '请输入本次收款金额',
+				icon: 'none'
+			})
+			return false
+		}
+		if(formData.value.applyAmount == '') {
+			uni.showToast({
+				title: '请选择收款类型',
+				icon: 'none'
+			})
+		}
+		if(formData.value.payUnit == '') {
+			uni.showToast({
+				title: '请选择收款账户',
+				icon: 'none'
+			})
+			return false
+		}
+		if(formData.value.remarks == '') {
+			uni.showToast({
+				title: '请输入备注',
+				icon: 'none'
+			})
+			return false
+		}
+		return true
+	}	
+	// 时间确定
+	const timeConfirm = (e) => {
+		formData.value.createDate = formatTimestamp(e.value)
+		timeshow.value = false;
 	}
 	// 选择类型Z 
 	const itemClick = (e) => {
@@ -338,14 +612,6 @@
 		startTime.value = "开始时间";
 		endTime.value = "结束时间";
 
-	}
-	// 转换时间戳
-	const formatTimestamp = (timestamp) => {
-		const date = new Date(timestamp);
-		const year = date.getFullYear();
-		const month = String(date.getMonth() + 1).padStart(2, '0');
-		const day = String(date.getDate()).padStart(2, '0');
-		return `${year}-${month}-${day}`;
 	}
 </script>
 

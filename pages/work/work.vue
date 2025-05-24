@@ -18,9 +18,8 @@
 </template>
 
 <script setup>
-	import {
-		API_getStartProcessList
-	} from '/api/task.js'
+import { API_getStartProcessList } from '@/api/task.js'
+
 	import {
 		ref,
 		reactive,

@@ -1,30 +1,34 @@
+
+
+
 <template>
 	<view class="">
-		<up-navbar title="收款申请详情" :placeholder="true" :autoBack="true" />
+		<up-navbar title="收款详情" :placeholder="true" :autoBack="true" />
 		<view class="conTop">
 			<view class="time">2023.02.12 16:00:00</view>
-			<view class="title bold">易尤特提交的收款申请</view>
-			<view class="zhongx">嘉兴运营中心</view>
-			<view class="type">已确认</view>
+			<view class="title bold">{{reimbursementDetail.projContract && reimbursementDetail.projContract.createUserName}}提交的收款申请</view>
+			<view class="zhongx">{{reimbursementDetail.entDeptName || '--'}}</view>
+			<view class="type">{{ getLabelByValue(reimbursementDetail.useStatus) || '--'}}</view>
 		</view>
 		<view class="fengx"></view>
 		<view class="conZho">
 			<view class="xinx bold  up-m-b-20">收款信息</view>
 			<view class="zhoItem u-flex u-col-center">
 				<view class="zhoLf">系统编号</view>
-				<view class="zhoRi up-m-l-30">20240812090816363960</view>
+				<view class="zhoRi up-m-l-30">{{reimbursementDetail.sysNo}}</view>
 			</view>
 			<view class="zhoItem u-flex u-col-center">
 				<view class="zhoLf">合同编号</view>
-				<view class="zhoRi up-m-l-30" style="color:#3C82FE">UI-3299-732959</view>
+				<view class="zhoRi up-m-l-30"  style="color:#3C82FE">{{reimbursementDetail.projContract && reimbursementDetail.projContract.code}}</view>
 			</view>
+
 			<view class="zhoItem u-flex u-col-center">
 				<view class="zhoLf">企业名称</view>
-				<view class="zhoRi up-m-l-30">易尤特集团</view>
+				<view class="zhoRi up-m-l-30">{{reimbursementDetail.projContract && reimbursementDetail.projContract.csrCustomerName}}</view>
 			</view>
 			<view class="zhoItem u-flex u-col-center">
 				<view class="zhoLf">税号</view>
-				<view class="zhoRi up-m-l-30">3279596</view>
+				<view class="zhoRi up-m-l-30">{{reimbursementDetail.projContract && reimbursementDetail.projContract.csrCustomerCode}}</view>
 			</view>
 			<!-- 	<view class="zhoItem u-flex u-col-center">
 				<view class="zhoLf">金额</view>
@@ -37,32 +41,31 @@
 						<view class="ttleft">产品</view>
 						<view class="ttright">收款金额</view>
 					</view>
-					<view class="tbalebot u-flex u-col-center u-row-around">
-						<view class="ttleft">CE-EMC</view>
-						<view class="ttright" style="color:#FE4949">26000</view>
+					<view class="tbalebot u-flex u-col-center u-row-around" v-for="(item,index) in (reimbursementDetail.projReceivableSubs || [])" :key="index">
+						<view class="ttleft">{{ item.projServerName}}</view>
+						<view class="ttright" style="color:#FE4949">{{item.recPrice}}</view>
 					</view>
 				</view>
 			</view>
 			<view class="zhoItem u-flex u-col-center">
 				<view class="zhoLf">收款金额</view>
-				<view class="zhoRi up-m-l-30" style="color:#FE4949">3279596</view>
+				<view class="zhoRi up-m-l-30">{{reimbursementDetail.recPrice}}</view>
 			</view>
 			<view class="zhoItem u-flex u-col-center">
 				<view class="zhoLf">收款类型</view>
-				<view class="zhoRi up-m-l-30">3279596</view>
+				<view class="zhoRi up-m-l-30">{{reimbursementDetail.type}}</view>
 			</view>
 			<view class="zhoItem u-flex u-col-center">
 				<view class="zhoLf">收款账户</view>
-				<view class="zhoRi up-m-l-30">3279596</view>
+				<view class="zhoRi up-m-l-30">{{reimbursementDetail.account}}</view>
 			</view>
 			<view class="zhoItem u-flex u-col-center">
 				<view class="zhoLf">收款公司</view>
-				<view class="zhoRi up-m-l-30">3279596</view>
+				<view class="zhoRi up-m-l-30">{{getNameByNo(reimbursementDetail.account,zhanghuList,'account','name')}}</view>
 			</view>
-			
 			<view class="zhoLf">备注</view>
 			<view class="textClass up-m-t-20">
-				<view>如怀疑存在 DNS 劫持，可尝试更换 D</view>
+				<view>{{reimbursementDetail.remarks}}</view>
 			</view>
 		</view>
 		<view class="fengx"></view>
@@ -70,35 +73,103 @@
 			<view class="xinx bold up-m-b-20">确认信息</view>
 			<view class="zhoItem u-flex u-col-center">
 				<view class="zhoLf">确认人</view>
-				<view class="zhoRi up-m-l-30">崔总助理</view>
-			</view>	<view class="zhoItem u-flex u-col-center">
-				<view class="zhoLf">确认时间</view>
-				<view class="zhoRi up-m-l-30">2023.02.12 16:00:00</view>
+				<view class="zhoRi up-m-l-30">{{reimbursementDetail.confirmUserName || '--'}}</view>
 			</view>
-			<view class="zhoLf">备注</view>
-			<view class="textClass up-m-t-20">
-				<view>如怀疑存在 DNS 劫持，可尝试更换 D</view>
+			<view class="zhoItem u-flex u-col-center">
+				<view class="zhoLf">确认时间</view>
+				<view class="zhoRi up-m-l-30">{{reimbursementDetail.confirmDate || '--'}}</view>
 			</view>
 		</view>
-		<view class="fengx"></view>
+		<!-- <view class="fengx"></view>
 		<view class="conZho">
 			<view class="xinx bold up-m-b-20">流程及办理</view>
+			<template v-for="(item,index) in (reimbursementDetail.historyProcNodeList || [])" :key="index">
 			<view class="liucItem u-flex">
-				<image src="/static/logo.png"></image>
+				<image :src="item.avatar || '/static/user/default-icon.jpg'"></image>
 				<view class="liucRight u-flex up-m-l-20 u-row-between">
 					<view class="">
-						<view class="lrleft">发起申请</view>
+						<view class="lrleft">{{item.assigneeName}}</view>
 						<view class="lrlbot">发起人</view>
 					</view>
-					<view class="lrleft">2023.03.26 16:00:00</view>
+					<view class="lrleft">{{item.createTime}}</view>
 				</view>
 			</view>
-			<view class="shux up-m-l-50 up-m-t-20"></view>
-		</view>
+			<view class="shux up-m-l-50 up-m-t-20" v-if="index !== (reimbursementDetail.historyProcNodeList || []).length - 1"></view>
+			</template>
+		</view> -->
 	</view>
 </template>
 
 <script setup>
+import {
+	ref,
+	reactive,
+	onMounted
+} from 'vue'
+import {
+	useRoute
+} from 'vue-router'
+import {
+	API_finApiReceivepayDetail,
+	API_finApitranslateType,
+	API_finApiReceivepayAccountList
+} from '/api/task.js'
+import {
+	API_getDictType
+} from '/api/client.js'
+import { getLabelByValue } from '/util/dict.js'
+const sysNo = ref('')
+const reimbursementDetail = ref({})
+const translateType = ref([])
+const inTypeList = ref([])
+const zhanghuList = ref([])
+const route = useRoute()
+onMounted(() => {
+	sysNo.value = route.query.sysNo
+	getReimbursementDetail()
+	getReimbursementType()
+	getInType()
+	getAccountList()
+})
+function getReimbursementDetail() {
+	API_finApiReceivepayDetail({
+		sysNo: sysNo.value
+	}).then(res => {
+		console.log(res,'收款详情')
+		reimbursementDetail.value = res.data
+	})
+}
+	// 获取收款账户列表
+	function getAccountList() {
+		API_finApiReceivepayAccountList().then(res => {
+			console.log(res,'收款账户列表')
+			if(res.code == 200) {
+				let result = res.data
+				zhanghuList.value = result
+			}
+		})
+	}
+	// 获取报销类型
+function getReimbursementType() {
+		API_finApitranslateType().then(res => {
+			if(res.code == 200) {
+				let result = res.data
+				translateType.value = result
+			}
+		})
+	}
+	// 获取是否预算内类型
+	function getInType() {
+		API_getDictType({dictType: 'receive_payment_type'}).then(res => {
+			if(res.code == 200) {
+				let result = res.data
+				inTypeList.value = result
+			}
+		})
+	}
+function getNameByNo(sn,list,key,labelKey) {
+	return list.find(item => item[key] == sn)?.[labelKey] || '--'
+}
 </script>
 
 <style scoped lang="scss">
