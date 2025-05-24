@@ -385,6 +385,8 @@
 		if (currentUser) {
 			form.sysNo = currentUser.sysNo; // 根据实际用户对象字段调整
 			form.user = currentUser.name;
+			form.inUserSysNo = currentUser.sysNo;
+			form.inUserName = currentUser.name;
 		}
 		// 监听从产品选择页面返回的数据
 		uni.$on('confirmProduct', handleConfirmProduct);
