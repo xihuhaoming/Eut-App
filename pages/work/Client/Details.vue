@@ -20,14 +20,14 @@
 						添加标签
 					</view>
 				</view>
-				<view class="title up-m-t-30">公司客户</view>
-				<view class="leix up-m-t-10">来源：老客户</view>
+				<view class="title up-m-t-30">{{ companyClientData.contacts }}</view>
+				<view class="leix up-m-t-10">来源：{{ companyClientData.customerType === 0 ? '新客户' : companyClientData.customerType === 1 ? '老客户' : '激活客户' }}</view>
 				<view class="inforight u-text-center">
 					<image src="/static/client/kehu1.png"></image>
 					<view>未标记</view>
 				</view>
 				<view class="infobot">
-					钻石客户
+					{{ companyClientData.level === 0 ? '未标记' : companyClientData.level === 1 ? '钻石客户' : 'VIP客户' }}
 				</view>
 			</view>
 		</view>
@@ -37,10 +37,9 @@
 				activeStyle="color: #092D5C;font-size:30rpx"></up-tabs>
 		</view>
 		<!-- 个人客户 -->
-		<view v-if="tabIndex==0" class="pd-30">
+		<view v-if="tabIndex==100" class="pd-30">
 			<view class="card">
-				<up-cell size="large" title="意向项目类别" value="项目的类别" :isLink="false"></up-cell>
-				<up-cell size="large" title="电话" value="客户名称" :isLink="false"></up-cell>
+				<up-cell size="large" title="客户名称" value="客户名称" :isLink="false"></up-cell>
 				<up-cell size="large" title="身份证号" value="274958939" :isLink="false"></up-cell>
 				<up-cell size="large" title="公司" value="主联系人" :isLink="false"></up-cell>
 				<up-cell size="large" title="部门" value="项目的类别" :isLink="false"></up-cell>
@@ -51,46 +50,45 @@
 		<!-- 企业客户 -->
 		<view v-if="tabIndex==0" class="pd-30">
 			<view class="card">
-				<up-cell size="large" title="意向项目类别" value="项目的类别" :isLink="false"></up-cell>
-				<up-cell size="large" title="企业名称" value="客户名称" :isLink="false"></up-cell>
-				<up-cell size="large" title="社会统一信用码" value="274958939" :isLink="false"></up-cell>
-				<up-cell size="large" title="主联系人" value="主联系人" :isLink="false"></up-cell>
-				<up-cell size="large" title="联系人手机" value="项目的类别" :isLink="false"></up-cell>
-				<up-cell size="large" title="坐标" value="项目的类别" :isLink="false"></up-cell>
-				<up-cell size="large" title="地区" value="项目的类别" :isLink="false"></up-cell>
-				<up-cell size="large" title="详细地址" value="项目的类别" :isLink="false"></up-cell>
+				<up-cell size="large" title="企业名称" :value="companyClientData.name" :isLink="false" ></up-cell>
+				<up-cell size="large" title="社会统一信用码" :value="companyClientData.code" :isLink="false"></up-cell>
+				<up-cell size="large" title="主联系人" :value="companyClientData.contacts" :isLink="false"></up-cell>
+				<up-cell size="large" title="联系人手机" :value="companyClientData.phone" :isLink="false"></up-cell>
+				<up-cell size="large" title="坐标" :value="companyClientData.coordinate" :isLink="false"></up-cell>
+				<up-cell size="large" title="地区" :value="companyClientData.region" :isLink="false"></up-cell>
+				<up-cell size="large" title="详细地址" :value="companyClientData.address" :isLink="false"></up-cell>
 			</view>
 			<view class="card up-m-t-20">
-				<up-cell size="large" title="法人" value="项目的类别" :isLink="false"></up-cell>
-				<up-cell size="large" title="法人电话" value="客户名称" :isLink="false"></up-cell>
+				<up-cell size="large" title="法人" :value="companyClientData.legal" :isLink="false"></up-cell>
+				<up-cell size="large" title="法人电话" :value="companyClientData.legalPhone" :isLink="false"></up-cell>
 				<up-cell size="large" title="公司电话" value="274958939" :isLink="false"></up-cell>
-				<up-cell size="large" title="传真" value="主联系人" :isLink="false"></up-cell>
+				<up-cell size="large" title="传真" :value="companyClientData.fax" :isLink="false"></up-cell>
 			</view>
 
 			<view class="xtitle bold up-m-t-20">其他联系人</view>
-			<view class="card up-m-t-20" style="padding:30rpx">
+			<view class="card up-m-t-20" style="padding:30rpx" v-for="item in otherUserList" :key="item.id">
 				<view class="zhoItem u-flex u-col-center">
 					<view class="zhoLf">联系人名称</view>
-					<view class="zhoRi up-m-l-30">开发部/UI 设计师</view>
+					<view class="zhoRi up-m-l-30">{{item.name}}</view>
 				</view>
 				<view class="zhoItem u-flex u-col-center">
 					<view class="zhoLf">电话：</view>
-					<view class="zhoRi up-m-l-30">7395932</view>
+					<view class="zhoRi up-m-l-30">{{item.phone}}</view>
 				</view>
 				<view class="zhoItem u-flex u-col-center">
 					<view class="zhoLf">邮箱：</view>
-					<view class="zhoRi up-m-l-30">27439590436@qq.co</view>
+					<view class="zhoRi up-m-l-30">{{item.email}}</view>
 				</view>
 				<image src="/static/client/phone2.png" class="phone"></image>
 			</view>
 			<view class="xtitle bold up-m-t-20">账户信息</view>
 			<view class="card up-m-t-20" style="margin-bottom:200rpx">
-				<up-cell size="large" title="银行账号" value="项目的类别" :isLink="false"></up-cell>
-				<up-cell size="large" title="开户行" value="客户名称" :isLink="false"></up-cell>
-				<up-cell size="large" title="邮箱" value="274958939" :isLink="false"></up-cell>
-				<up-cell size="large" title="开票电话" value="主联系人" :isLink="false"></up-cell>
-				<up-cell size="large" title="开票联系电话" value="项目的类别" :isLink="false"></up-cell>
-				<up-cell size="large" title="注册地址" value="项目的类别" :isLink="false"></up-cell>
+				<up-cell size="large" title="银行账号" :value="companyClientData.bankAccount" :isLink="false"></up-cell>
+				<up-cell size="large" title="开户行" :value="companyClientData.bankType" :isLink="false"></up-cell>
+				<up-cell size="large" title="邮箱" :value="companyClientData.email" :isLink="false"></up-cell>
+				<up-cell size="large" title="开票电话" :value="companyClientData.invoiceTel" :isLink="false"></up-cell>
+				<up-cell size="large" title="开票联系电话" :value="companyClientData.invoicePhone" :isLink="false"></up-cell>
+				<up-cell size="large" title="注册地址" :value="companyClientData.registeredAddress" :isLink="false"></up-cell>
 			</view>
 		</view>
 		<view v-if="tabIndex==1" class="pd-30">
@@ -109,18 +107,18 @@
 			</view>
 		</view>
 		<view v-if="tabIndex==2" class="pd-30">
-			<view class="pic pd-30 up-m-t-20">
+			<view class="pic pd-30 up-m-t-20" v-for="item in projectList" :key="item.id">
 				<view class="picttle bold">
-					项目名称
+					{{ item.projectName? item.projectName : '未命名' }}
 				</view>
 				<view class="piccon">
-					金额：73925.00
+					金额：{{ item.projectAmount }}
 				</view>
 				<view class="piccon">
-					到期时间：<text style="color:#FE4949">2023.05.23</text>
+					到期时间：<text style="color:#FE4949">{{ item.expireDate? item.expireDate : '未设置' }}</text>
 				</view>
 				<view class="piccon">
-					签发机构：机构名称
+					签发机构：{{ item.issuingAgency? item.issuingAgency : '未设置' }}
 				</view>
 			</view>
 		</view>
@@ -145,8 +143,15 @@
 	import {
 		ref,
 		reactive,
-		onMounted
+		onMounted,
+		watch
 	} from 'vue';
+	import {
+		API_getClientBySysNo
+	} from '@/api/client';
+	import {
+		useRoute
+	} from 'vue-router';
 	const tabIndex = ref(0)
 	const list = reactive([{
 			name: '基本信息'
@@ -159,6 +164,64 @@
 	]);
 	const bgColor = ref('#3C82FE');
 
+
+	// 定义 id 变量
+	const id = ref(null);
+
+	
+
+	const companyClientData = ref({})
+
+	// 新增一个 ref 来存储处理后的 otherUser 字符串
+	const otherUserDisplayString = ref('');
+
+	onMounted(() => {
+		// 获取当前页面实例
+		const pages = getCurrentPages();
+  		const currentPage = pages[pages.length - 1];
+		// 从页面参数中获取 id
+		if (currentPage.options && currentPage.options.id) {
+			id.value = currentPage.options.id;
+			console.log('获取到客户ID:', id.value);
+			// 获取客户详情
+			getClientDetailFun();
+		} else {
+			console.error('未获取到客户ID');
+		}
+		
+	});
+
+	const projectList = ref([])
+
+	// 监听 companyClientData.value.otherUser 的变化
+	watch(() => companyClientData.value.otherUser, (newOtherUser) => {
+		if (newOtherUser) {
+			processOtherUser(newOtherUser);
+		} else {
+			otherUserDisplayString.value = '暂无其他联系人';
+		}
+	}, { deep: true, immediate: false }); 
+
+	const otherUserList = ref([])
+
+	const processOtherUser = (otherUserData) => {
+		console.log("开始处理 otherUser 数据:", otherUserData);
+		let users = [];
+		if (typeof otherUserData === 'string') {
+			try {
+				users = JSON.parse(otherUserData); // 如果是JSON字符串，先解析
+				if (!Array.isArray(users)) { // 如果解析出来不是数组，置为空数组
+					console.warn("解析后的 otherUser 不是一个数组:", users);
+					users = [];
+				}
+			} catch (e) {
+				console.error("解析 otherUser JSON 字符串失败:", e);
+				users = []; // 解析失败则视为空数组
+			}
+		}
+		otherUserList.value = users
+	};
+
 	// tab切换
 	const tabclick = (e) => {
 		console.log(e)
@@ -169,6 +232,25 @@
 			url: '/pages/work/Client/addFollow'
 		})
 	}
+
+	
+	// 获取客户详情
+	const getClientDetailFun = async () => {
+		console.log(id.value)
+		if (!id.value) {
+			return;
+		}
+		const params = {
+			sysNo: id.value
+		};
+		const res = await API_getClientBySysNo(params)
+		console.log(res)
+		companyClientData.value = res.data
+		projectList.value = res.data.projectList
+	}
+	
+
+
 </script>
 
 <style lang="scss" scoped>
